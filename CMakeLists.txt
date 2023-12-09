@@ -14,11 +14,6 @@ find_package(CUDAToolkit REQUIRED)
 
 find_package(PkgConfig)
 pkg_check_modules(MAGMA REQUIRED IMPORTED_TARGET magma)
-# include_directories(SYSTEM ${MAGMA_INCLUDE_DIRS})
-# string(REPLACE "=" "" MAGMA_INCLUDE_DIRS "${MAGMA_INCLUDE_DIRS}")
-# message("MAGMA_INCLUDE_DIRS = ${MAGMA_INCLUDE_DIRS}")
-# message("MAGMA_LIBRARY_DIRS = ${MAGMA_LIBRARY_DIRS}")
-# message("   MAGMA_LIBRARIES = ${MAGMA_LIBRARIES}")
 
 include(FetchContent)
 find_package(Catch2 QUIET)
@@ -32,9 +27,6 @@ endif()
 enable_testing()
 
 find_package(Eigen3 REQUIRED)
-
-# find_package(MAGMA REQUIRED)
-
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
 message(${LAPACK_LIBRARIES})
@@ -66,6 +58,7 @@ set(modules
 	SelfAdjointEigenSolverGPU
 	ComplexEigenSolverGPU
 )
+subdirs(benchmark)
 
 foreach(name IN LISTS modules)
 	add_executable(${name}_test ${name}_test.cu)
@@ -79,4 +72,16 @@ foreach(name IN LISTS modules)
 		PkgConfig::MAGMA
 	)
 	add_test(${name}_test ${name}_test)
+
+	add_executable(${name}_c_test ${name}_test.cu)
+	target_compile_options(${name}_c_test PRIVATE -Wall -Wextra -Wfatal-errors -DFLOAT)
+	target_link_libraries(${name}_c_test
+		Catch2::Catch2WithMain
+		Eigen3::Eigen
+		OpenMP::OpenMP_CXX
+		LAPACK::LAPACK
+		BLAS::BLAS
+		PkgConfig::MAGMA
+	)
+	add_test(${name}_c_test ${name}_c_test)
 endforeach(name)

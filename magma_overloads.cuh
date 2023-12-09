@@ -211,7 +211,8 @@ template<typename Scalar_, typename Index1_, typename Index2_, typename Index3_,
 static inline Index1_ magma_geev_gpu(magma_vec_t jobvl, magma_vec_t jobvr, Index2_ n, Scalar_* A,
                                      Index3_ ldda, Scalar_* w, Scalar_* VL, Index4_ ldvl,
                                      Scalar_* VR, Index5_ ldvr, Scalar_* work, Index6_ lwork,
-                                     double* rwork, Index1_* info) {
+                                     typename Eigen::NumTraits<Scalar_>::Real* rwork,
+                                     Index1_*                                  info) {
 	if constexpr(std::is_same_v<Scalar_, float>) {
 		return magma_sgeev(jobvl, jobvr, n, A, ldda, w, VL, ldvl, VR, ldvr, work, lwork, rwork,
 		                   info);

@@ -1,11 +1,15 @@
 #include <catch2/catch_test_macros.hpp>
-#include "MatrigGPU.cuh"
+#include "MatrixGPU.cuh"
 #include <Eigen/Dense>
 #include <iostream>
 #include <random>
 
+#ifdef FLOAT
+using RealScalar = float;
+#else
 using RealScalar = double;
-using Scalar     = std::complex<RealScalar>;
+#endif
+using Scalar = std::complex<RealScalar>;
 
 TEST_CASE("MatrixGPU", "test") {
 	std::mt19937                         engine(0);

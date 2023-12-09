@@ -25,24 +25,47 @@
 #endif
 
 #ifndef cuCHECK
-	#define cuCHECK(call)                                                                   \
-		{                                                                                   \
-			const cudaError_t error = call;                                                 \
-			if(error != cudaSuccess) {                                                      \
-				fprintf(stderr, "cuCHECK Error: %s:%d,  ", __FILE__, __LINE__);             \
-				fprintf(stderr, "code:%d, reason: %s\n", error, cudaGetErrorString(error)); \
-				assert(error == cudaSuccess);                                               \
-			}                                                                               \
-		};
+	#ifndef __CUDA_ARCH__
+		#define cuCHECK(call)                                                                   \
+			{                                                                                   \
+				const cudaError_t error = call;                                                 \
+				if(error != cudaSuccess) {                                                      \
+					fprintf(stderr, "cuCHECK Error: %s:%d,  ", __FILE__, __LINE__);             \
+					fprintf(stderr, "code:%d, reason: %s\n", error, cudaGetErrorString(error)); \
+					assert(error == cudaSuccess);                                               \
+				}                                                                               \
+			};
+	#else
+		#define cuCHECK(call)                                                          \
+			{                                                                          \
+				const cudaError_t error = call;                                        \
+				if(error != cudaSuccess) {                                             \
+					printf("cuCHECK Error: %s:%d,  ", __FILE__, __LINE__);             \
+					printf("code:%d, reason: %s\n", error, cudaGetErrorString(error)); \
+					assert(error == cudaSuccess);                                      \
+				}                                                                      \
+			};
+	#endif
 #endif
 
 #ifndef CUSOLVER_CHECK
-	#define CUSOLVER_CHECK(err)                                                            \
-		do {                                                                               \
-			cusolverStatus_t err_ = (err);                                                 \
-			if(err_ != CUSOLVER_STATUS_SUCCESS) {                                          \
-				fprintf(stderr, "cusolver error %d at %s:%d\n", err_, __FILE__, __LINE__); \
-				throw std::runtime_error("cusolver error");                                \
-			}                                                                              \
-		} while(0);
+	#ifndef __CUDA_ARCH__
+		#define CUSOLVER_CHECK(err)                                                            \
+			do {                                                                               \
+				cusolverStatus_t err_ = (err);                                                 \
+				if(err_ != CUSOLVER_STATUS_SUCCESS) {                                          \
+					fprintf(stderr, "cusolver error %d at %s:%d\n", err_, __FILE__, __LINE__); \
+					throw std::runtime_error("cusolver error");                                \
+				}                                                                              \
+			} while(0);
+	#else
+		#define CUSOLVER_CHECK(err)                                                   \
+			do {                                                                      \
+				cusolverStatus_t err_ = (err);                                        \
+				if(err_ != CUSOLVER_STATUS_SUCCESS) {                                 \
+					printf("cusolver error %d at %s:%d\n", err_, __FILE__, __LINE__); \
+					assert(error == cudaSuccess);                                     \
+				}                                                                     \
+			} while(0);
+	#endif
 #endif

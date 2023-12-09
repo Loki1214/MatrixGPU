@@ -2,7 +2,7 @@
 #pragma once
 
 #include "macros.hpp"
-#include "MatrigGPU.cuh"
+#include "MatrixGPU.cuh"
 #include "magma_overloads.cuh"
 
 namespace GPU {

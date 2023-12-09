@@ -1,5 +1,6 @@
 #pragma once
 
+#include "macros.hpp"
 #include <Eigen/Core>
 #include <thrust/device_vector.h>
 #include <magma_v2.h>
@@ -13,8 +14,17 @@ namespace std {
 namespace GPU {
 	class MAGMA {
 		private:
-			MAGMA() { magma_init(); }
-			~MAGMA() { magma_finalize(); }
+			magma_queue_t m_queue = NULL;
+			MAGMA() {
+				DEBUG(std::cerr << "# Constructor: " << __func__ << std::endl);
+				magma_init();
+				magma_queue_create(0, &m_queue);
+			}
+			~MAGMA() {
+				magma_queue_destroy(m_queue);
+				magma_finalize();
+				DEBUG(std::cerr << "# Destructor: " << __func__ << std::endl);
+			}
 
 		public:
 			MAGMA(const MAGMA&)            = delete;
@@ -26,6 +36,8 @@ namespace GPU {
 				static MAGMA instance;
 				return instance;
 			}
+
+			static magma_queue_t const& queue() { return get_contoroller().m_queue; }
 	};
 
 	template<typename Scalar_>
@@ -87,11 +99,8 @@ namespace GPU {
 
 			// Custom constructor
 			MatrixGPU(MatrixCPU const& mat) : MatrixGPU(mat.rows(), mat.cols()) {
-				magma_queue_t queue = NULL;
-				magma_queue_create(0, &queue);
 				magma_setmatrix(mat.rows(), mat.cols(), sizeof(Scalar), mat.data(), mat.rows(),
-				                this->data(), m_LD, queue);
-				magma_queue_destroy(queue);
+				                this->data(), m_LD, MAGMA::queue());
 			}
 
 		public:
@@ -117,11 +126,8 @@ namespace GPU {
 
 			void copyTo(MatrixCPU& res) const {
 				res.resize(m_rows, m_cols);
-				magma_queue_t queue = NULL;
-				magma_queue_create(0, &queue);
 				magma_getmatrix(res.rows(), res.cols(), sizeof(Scalar), this->data(), m_LD,
-				                res.data(), res.rows(), queue);
-				magma_queue_destroy(queue);
+				                res.data(), res.rows(), MAGMA::queue());
 			}
 
 			friend std::ostream& operator<<(std::ostream& os, MatrixGPU const& dmat) {
