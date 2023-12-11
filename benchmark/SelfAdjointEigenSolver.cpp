@@ -1,3 +1,4 @@
+#include "macros.hpp"
 #include <Eigen/Dense>
 #include <complex>
 #include <iostream>
