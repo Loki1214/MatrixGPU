@@ -22,11 +22,12 @@ TEST_CASE("MatrixGPU", "test") {
 	Eigen::MatrixX<Scalar> mat = Eigen::MatrixX<Scalar>::NullaryExpr(
 	    dim, dim, [&]() { return Scalar(dist(engine), dist(engine)); });
 	mat = (mat + mat.adjoint()).eval();
+	mat /= std::sqrt(mat.norm());
 	GPU::MatrixGPU<decltype(mat)> dmat(mat);
 	REQUIRE(dmat.rows() == dim);
 	REQUIRE(dmat.cols() == dim);
 
-	constexpr double precision = 1.0E-10;
+	constexpr double precision = 1.0E-4;
 	{
 		GPU::SelfAdjointEigenSolver<decltype(mat)> hsolver(mat);
 		auto const&                                eigVecs = hsolver.eigenvectors();

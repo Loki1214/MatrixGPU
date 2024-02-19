@@ -45,11 +45,10 @@ namespace GPU {
 				            &m_info);
 				DEBUG(std::cerr << "#        m_eigvecs.rows() = " << m_eigvecs.rows() << std::endl);
 				DEBUG(std::cerr << "#        m_eigvecs.cols() = " << m_eigvecs.cols() << std::endl);
-				DEBUG(std::cerr << "# int(std::real(work[0])) = " << int(std::real(work[0]))
-				                << std::endl);
+				DEBUG(std::cerr << "# int(real(work[0])) = " << int(real(work[0])) << std::endl);
 				DEBUG(std::cerr << "#          int(rwork[0])) = " << int(rwork[0]) << std::endl);
 				DEBUG(std::cerr << "#                iwork[0] = " << iwork[0] << std::endl);
-				work.resize(int(std::real(work[0])));
+				work.resize(int(real(work[0])));
 				rwork.resize(int(rwork[0]));
 				iwork.resize(iwork[0]);
 				DEBUG(std::cerr << "#             work.size() = " << work.size() << std::endl);
@@ -84,10 +83,11 @@ namespace GPU {
 		public:
 			SelfAdjointEigenSolver() = default;
 			SelfAdjointEigenSolver(MatrixGPU const& dmat) { this->compute(dmat); }
-			MatrixCPU eigenvectors() const {
-				MatrixCPU res(m_eigvecs.rows(), m_eigvecs.cols());
-				m_eigvecs.copyTo(res);
-				return res;
+			MatrixGPU const& eigenvectorsGPU() const { return m_eigvecs; }
+			MatrixCPU        eigenvectors() const {
+                MatrixCPU res(m_eigvecs.rows(), m_eigvecs.cols());
+                m_eigvecs.copyTo(res);
+                return res;
 			}
 			VectorCPU const&        eigenvalues() const { return m_eigvals; }
 			SelfAdjointEigenSolver& compute(MatrixGPU const& dmat,
@@ -107,11 +107,10 @@ namespace GPU {
 				                rwork.data(), -1, iwork.data(), -1, &m_info);
 				DEBUG(std::cerr << "#        m_eigvecs.rows() = " << m_eigvecs.rows() << std::endl);
 				DEBUG(std::cerr << "#        m_eigvecs.cols() = " << m_eigvecs.cols() << std::endl);
-				DEBUG(std::cerr << "# int(std::real(work[0])) = " << int(std::real(work[0]))
-				                << std::endl);
+				DEBUG(std::cerr << "# int(real(work[0])) = " << int(real(work[0])) << std::endl);
 				DEBUG(std::cerr << "#          int(rwork[0])) = " << int(rwork[0]) << std::endl);
 				DEBUG(std::cerr << "#                iwork[0] = " << iwork[0] << std::endl);
-				work.resize(int(std::real(work[0])));
+				work.resize(int(real(work[0])));
 				rwork.resize(int(rwork[0]));
 				iwork.resize(iwork[0]);
 				DEBUG(std::cerr << "#             work.size() = " << work.size() << std::endl);

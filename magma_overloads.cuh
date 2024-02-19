@@ -2,8 +2,9 @@
 
 #include <magma_v2.h>
 #include <magma_operators.h>
+#include <cuda/std/complex>
 
-// MAGMA_COMPLEX_TYPES
+// MAGMA_COMPLEX_TYPES and CUDA_STD_COMPLEX_TYPES
 #include <Eigen/Core>
 namespace Eigen {
 
@@ -38,6 +39,29 @@ namespace Eigen {
 				IsComplex             = 1,
 				RequireInitialization = NumTraits<Real>::RequireInitialization,
 				ReadCost              = 2 * NumTraits<Real>::ReadCost,
+				AddCost               = 2 * NumTraits<Real>::AddCost,
+				MulCost               = 4 * NumTraits<Real>::MulCost + 2 * NumTraits<Real>::AddCost
+			};
+
+			EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR static inline Real epsilon() {
+				return NumTraits<Real>::epsilon();
+			}
+			EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR static inline Real dummy_precision() {
+				return NumTraits<Real>::dummy_precision();
+			}
+			EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR static inline int digits10() {
+				return NumTraits<Real>::digits10();
+			}
+	};
+
+	template<typename Real_>
+	struct NumTraits<cuda::std::complex<Real_> > : GenericNumTraits<cuda::std::complex<Real_> > {
+			typedef Real_                              Real;
+			typedef typename NumTraits<Real_>::Literal Literal;
+			enum {
+				IsComplex             = 1,
+				RequireInitialization = NumTraits<Real_>::RequireInitialization,
+				ReadCost              = 2 * NumTraits<Real_>::ReadCost,
 				AddCost               = 2 * NumTraits<Real>::AddCost,
 				MulCost               = 4 * NumTraits<Real>::MulCost + 2 * NumTraits<Real>::AddCost
 			};
@@ -189,12 +213,18 @@ static inline Index1_ magma_heevd_gpu(magma_vec_t jobz, magma_uplo_t uplo, Index
 		return magma_dheevd_gpu(jobz, uplo, n, dA, ldda, w, wA, ldwa, work, lwork, rwork, lrwork,
 		                        reinterpret_cast<magma_int_t*>(iwork), liwork, info);
 	}
-	else if constexpr(std::is_same_v<Scalar_, magmaFloatComplex>) {
-		return magma_cheevd_gpu(jobz, uplo, n, dA, ldda, w, wA, ldwa, work, lwork, rwork, lrwork,
+	else if constexpr(std::is_same_v<Scalar_, magmaFloatComplex>
+	                  || std::is_same_v<Scalar_, cuda::std::complex<float>>) {
+		return magma_cheevd_gpu(jobz, uplo, n, reinterpret_cast<magmaFloatComplex*>(dA), ldda, w,
+		                        reinterpret_cast<magmaFloatComplex*>(wA), ldwa,
+		                        reinterpret_cast<magmaFloatComplex*>(work), lwork, rwork, lrwork,
 		                        reinterpret_cast<magma_int_t*>(iwork), liwork, info);
 	}
-	else if constexpr(std::is_same_v<Scalar_, magmaDoubleComplex>) {
-		return magma_zheevd_gpu(jobz, uplo, n, dA, ldda, w, wA, ldwa, work, lwork, rwork, lrwork,
+	else if constexpr(std::is_same_v<Scalar_, magmaDoubleComplex>
+	                  || std::is_same_v<Scalar_, cuda::std::complex<double>>) {
+		return magma_zheevd_gpu(jobz, uplo, n, reinterpret_cast<magmaDoubleComplex*>(dA), ldda, w,
+		                        reinterpret_cast<magmaDoubleComplex*>(wA), ldwa,
+		                        reinterpret_cast<magmaDoubleComplex*>(work), lwork, rwork, lrwork,
 		                        reinterpret_cast<magma_int_t*>(iwork), liwork, info);
 	}
 	else {
