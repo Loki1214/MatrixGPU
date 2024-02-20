@@ -1,6 +1,7 @@
 #pragma once
 
 #include "macros.hpp"
+#include "magma_overloads.cuh"
 #include <Eigen/Core>
 #include <thrust/device_vector.h>
 #include <magma_v2.h>
