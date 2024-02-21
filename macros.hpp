@@ -18,10 +18,12 @@
 	#endif
 #endif
 
-#if defined(NDEBUG) || defined(__CUDA_ARCH__)
-	#define DEBUG(arg)
-#else
-	#define DEBUG(arg) (arg)
+#ifndef DEBUG
+	#if defined(NDEBUG) || defined(__CUDA_ARCH__)
+		#define DEBUG(arg)
+	#else
+		#define DEBUG(arg) (arg)
+	#endif
 #endif
 
 #ifndef cuCHECK
