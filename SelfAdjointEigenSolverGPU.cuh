@@ -43,17 +43,17 @@ namespace GPU {
 				magma_heevd(jobz, uplo, m_eigvecs.rows(), m_eigvecs.data(), m_eigvecs.rows(),
 				            m_eigvals.data(), work.data(), -1, rwork.data(), -1, iwork.data(), -1,
 				            &m_info);
-				DEBUG(std::cerr << "#        m_eigvecs.rows() = " << m_eigvecs.rows() << std::endl);
-				DEBUG(std::cerr << "#        m_eigvecs.cols() = " << m_eigvecs.cols() << std::endl);
+				DEBUG(std::cerr << "#   m_eigvecs.rows() = " << m_eigvecs.rows() << std::endl);
+				DEBUG(std::cerr << "#   m_eigvecs.cols() = " << m_eigvecs.cols() << std::endl);
 				DEBUG(std::cerr << "# int(real(work[0])) = " << int(real(work[0])) << std::endl);
-				DEBUG(std::cerr << "#          int(rwork[0])) = " << int(rwork[0]) << std::endl);
-				DEBUG(std::cerr << "#                iwork[0] = " << iwork[0] << std::endl);
+				DEBUG(std::cerr << "#     int(rwork[0])) = " << int(rwork[0]) << std::endl);
+				DEBUG(std::cerr << "#           iwork[0] = " << iwork[0] << std::endl);
 				work.resize(int(real(work[0])));
 				rwork.resize(int(rwork[0]));
 				iwork.resize(iwork[0]);
-				DEBUG(std::cerr << "#             work.size() = " << work.size() << std::endl);
-				DEBUG(std::cerr << "#            rwork.size() = " << rwork.size() << std::endl);
-				DEBUG(std::cerr << "#            iwork.size() = " << iwork.size() << std::endl);
+				DEBUG(std::cerr << "#        work.size() = " << work.size() << std::endl);
+				DEBUG(std::cerr << "#       rwork.size() = " << rwork.size() << std::endl);
+				DEBUG(std::cerr << "#       iwork.size() = " << iwork.size() << std::endl);
 				magma_heevd(jobz, uplo, m_eigvecs.rows(), m_eigvecs.data(), m_eigvecs.rows(),
 				            m_eigvals.data(), work.data(), work.size(), rwork.data(), rwork.size(),
 				            iwork.data(), iwork.size(), &m_info);
@@ -105,17 +105,17 @@ namespace GPU {
 				magma_heevd_gpu(jobz, uplo, m_eigvecs.rows(), m_eigvecs.data(), m_eigvecs.LD(),
 				                m_eigvals.data(), wA.data(), wA.rows(), work.data(), -1,
 				                rwork.data(), -1, iwork.data(), -1, &m_info);
-				DEBUG(std::cerr << "#        m_eigvecs.rows() = " << m_eigvecs.rows() << std::endl);
-				DEBUG(std::cerr << "#        m_eigvecs.cols() = " << m_eigvecs.cols() << std::endl);
+				DEBUG(std::cerr << "#   m_eigvecs.rows() = " << m_eigvecs.rows() << std::endl);
+				DEBUG(std::cerr << "#   m_eigvecs.cols() = " << m_eigvecs.cols() << std::endl);
 				DEBUG(std::cerr << "# int(real(work[0])) = " << int(real(work[0])) << std::endl);
-				DEBUG(std::cerr << "#          int(rwork[0])) = " << int(rwork[0]) << std::endl);
-				DEBUG(std::cerr << "#                iwork[0] = " << iwork[0] << std::endl);
+				DEBUG(std::cerr << "#     int(rwork[0])) = " << int(rwork[0]) << std::endl);
+				DEBUG(std::cerr << "#           iwork[0] = " << iwork[0] << std::endl);
 				work.resize(int(real(work[0])));
 				rwork.resize(int(rwork[0]));
 				iwork.resize(iwork[0]);
-				DEBUG(std::cerr << "#             work.size() = " << work.size() << std::endl);
-				DEBUG(std::cerr << "#            rwork.size() = " << rwork.size() << std::endl);
-				DEBUG(std::cerr << "#            iwork.size() = " << iwork.size() << std::endl);
+				DEBUG(std::cerr << "#        work.size() = " << work.size() << std::endl);
+				DEBUG(std::cerr << "#       rwork.size() = " << rwork.size() << std::endl);
+				DEBUG(std::cerr << "#       iwork.size() = " << iwork.size() << std::endl);
 				magma_heevd_gpu(jobz, uplo, m_eigvecs.rows(), m_eigvecs.data(), m_eigvecs.LD(),
 				                m_eigvals.data(), wA.data(), wA.rows(), work.data(), work.size(),
 				                rwork.data(), rwork.size(), iwork.data(), iwork.size(), &m_info);

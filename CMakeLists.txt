@@ -1,19 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
-project(MatrixGPU CXX)
+project(HilbertSpace CXX)
 set(CMAKE_CXX_STANDARD 17)
-if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
-	set(CMAKE_CUDA_ARCHITECTURES 70)
-endif()
-enable_language(CUDA)
-# set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
-# set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr")
-#   set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --relocatable-device-code=true")
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcudafe --diag_suppress=esa_on_defaulted_function_ignored")
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -lineinfo -Xcompiler -rdynamic")
-find_package(CUDAToolkit REQUIRED)
-
-find_package(PkgConfig)
-pkg_check_modules(MAGMA REQUIRED IMPORTED_TARGET magma)
 
 include(FetchContent)
 find_package(Catch2 QUIET)
@@ -27,28 +14,37 @@ endif()
 enable_testing()
 
 find_package(Eigen3 REQUIRED)
-find_package(BLAS REQUIRED)
-find_package(LAPACK REQUIRED)
-message(${LAPACK_LIBRARIES})
-string(FIND "${LAPACK_LIBRARIES}" "libiomp" USE_libiomp)
-if("${USE_libiomp}" EQUAL "-1")
-	set(USE_libiomp FALSE)
-	message("libiomp is not found.")
-else()
-	set(USE_libiomp TRUE)
-	message("libiomp is found. Using libiomp.")
-	include_directories(SYSTEM "$ENV{MKLROOT}/include")
-	message("MKLROOT/include = $ENV{MKLROOT}/include")
-endif()
 
-# For OpenMP
+# For BLAS and LAPACK
+set(MKL_INTERFACE_FULL intel_lp64) # For compatibility with Eigen
+find_package(MKL REQUIRED)
+find_package(TBB REQUIRED)
 find_package(OpenMP REQUIRED)
-if(OpenMP_FOUND)
-	set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -fopenmp")
-endif()
-if(USE_libiomp)
-	set_property(TARGET OpenMP::OpenMP_CXX
-		PROPERTY INTERFACE_LINK_LIBRARIES "")
+
+find_package(PkgConfig)
+pkg_check_modules(MAGMA REQUIRED IMPORTED_TARGET magma)
+
+
+include(CheckLanguage)
+check_language(CUDA)
+if(CMAKE_CUDA_COMPILER)
+  enable_language(CUDA)
+  if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+    set(CMAKE_CUDA_ARCHITECTURES 80)
+  endif()
+  set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
+  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr")
+#   set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --relocatable-device-code=true") # Necessary for enabling CUDA Dynamic Parallelism
+  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcudafe --diag_suppress=esa_on_defaulted_function_ignored")
+  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -lineinfo -Xcompiler -rdynamic")
+  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Wall -Wextra -Wfatal-errors")
+  if(OpenMP_FOUND)
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -fopenmp")
+  endif()
+
+  find_package(CUDAToolkit REQUIRED)
+else()
+  message(STATUS "No CUDA support")
 endif()
 
 
@@ -66,22 +62,20 @@ foreach(name IN LISTS modules)
 	target_link_libraries(${name}_test
 		Catch2::Catch2WithMain
 		Eigen3::Eigen
+		MKL::MKL
 		OpenMP::OpenMP_CXX
-		LAPACK::LAPACK
-		BLAS::BLAS
 		PkgConfig::MAGMA
 	)
-	add_test(${name}_test ${name}_test)
+	add_test(${name}_test compute-sanitizer ${name}_test)
 
 	add_executable(${name}_c_test ${name}_test.cu)
 	target_compile_options(${name}_c_test PRIVATE -Wall -Wextra -Wfatal-errors -DFLOAT)
 	target_link_libraries(${name}_c_test
 		Catch2::Catch2WithMain
 		Eigen3::Eigen
+		MKL::MKL
 		OpenMP::OpenMP_CXX
-		LAPACK::LAPACK
-		BLAS::BLAS
 		PkgConfig::MAGMA
 	)
-	add_test(${name}_c_test ${name}_c_test)
+	add_test(${name}_c_test compute-sanitizer ${name}_c_test)
 endforeach(name)

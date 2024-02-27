@@ -178,12 +178,12 @@ static inline Index1_ magma_heevd(magma_vec_t jobz, magma_uplo_t uplo, Index2_ n
 		return magma_dheevd(jobz, uplo, n, A, lda, w, work, lwork, rwork, lrwork,
 		                    reinterpret_cast<magma_int_t*>(iwork), liwork, info);
 	}
-	else if constexpr(std::is_same_v<Scalar_, std::complex<float>>) {
+	else if constexpr(std::is_convertible_v<Scalar_, std::complex<float>>) {
 		return magma_cheevd(jobz, uplo, n, reinterpret_cast<magmaFloatComplex*>(A), lda, w,
 		                    reinterpret_cast<magmaFloatComplex*>(work), lwork, rwork, lrwork,
 		                    reinterpret_cast<magma_int_t*>(iwork), liwork, info);
 	}
-	else if constexpr(std::is_same_v<Scalar_, std::complex<double>>) {
+	else if constexpr(std::is_convertible_v<Scalar_, std::complex<double>>) {
 		return magma_zheevd(jobz, uplo, n, reinterpret_cast<magmaDoubleComplex*>(A), lda, w,
 		                    reinterpret_cast<magmaDoubleComplex*>(work), lwork, rwork, lrwork,
 		                    reinterpret_cast<magma_int_t*>(iwork), liwork, info);
@@ -213,15 +213,13 @@ static inline Index1_ magma_heevd_gpu(magma_vec_t jobz, magma_uplo_t uplo, Index
 		return magma_dheevd_gpu(jobz, uplo, n, dA, ldda, w, wA, ldwa, work, lwork, rwork, lrwork,
 		                        reinterpret_cast<magma_int_t*>(iwork), liwork, info);
 	}
-	else if constexpr(std::is_same_v<Scalar_, magmaFloatComplex>
-	                  || std::is_same_v<Scalar_, cuda::std::complex<float>>) {
+	else if constexpr(std::is_same_v<Scalar_, magmaFloatComplex>) {
 		return magma_cheevd_gpu(jobz, uplo, n, reinterpret_cast<magmaFloatComplex*>(dA), ldda, w,
 		                        reinterpret_cast<magmaFloatComplex*>(wA), ldwa,
 		                        reinterpret_cast<magmaFloatComplex*>(work), lwork, rwork, lrwork,
 		                        reinterpret_cast<magma_int_t*>(iwork), liwork, info);
 	}
-	else if constexpr(std::is_same_v<Scalar_, magmaDoubleComplex>
-	                  || std::is_same_v<Scalar_, cuda::std::complex<double>>) {
+	else if constexpr(std::is_same_v<Scalar_, magmaDoubleComplex>) {
 		return magma_zheevd_gpu(jobz, uplo, n, reinterpret_cast<magmaDoubleComplex*>(dA), ldda, w,
 		                        reinterpret_cast<magmaDoubleComplex*>(wA), ldwa,
 		                        reinterpret_cast<magmaDoubleComplex*>(work), lwork, rwork, lrwork,

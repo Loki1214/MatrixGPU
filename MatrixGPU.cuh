@@ -18,6 +18,14 @@ namespace GPU {
 			magma_queue_t m_queue = NULL;
 			MAGMA() {
 				DEBUG(std::cerr << "# Constructor: " << __func__ << std::endl);
+				size_t pValue;
+				cuCHECK(cudaDeviceGetLimit(&pValue, cudaLimitMallocHeapSize));
+				std::cout << "#\t cudaLimitMallocHeapSize = " << pValue << std::endl;
+				pValue *= 32 * 1024;
+				cuCHECK(cudaDeviceSetLimit(cudaLimitMallocHeapSize, pValue));
+				cuCHECK(cudaDeviceGetLimit(&pValue, cudaLimitMallocHeapSize));
+				std::cout << "#\t cudaLimitMallocHeapSize = " << pValue << std::endl;
+
 				magma_init();
 				magma_queue_create(0, &m_queue);
 			}
@@ -50,7 +58,15 @@ namespace GPU {
 			using Scalar = magmaFloatComplex;
 	};
 	template<>
+	struct traits<cuda::std::complex<float>> {
+			using Scalar = magmaFloatComplex;
+	};
+	template<>
 	struct traits<std::complex<double>> {
+			using Scalar = magmaDoubleComplex;
+	};
+	template<>
+	struct traits<cuda::std::complex<double>> {
 			using Scalar = magmaDoubleComplex;
 	};
 
