@@ -13,7 +13,7 @@ using RealScalar = double;
 using Scalar = std::complex<RealScalar>;
 
 TEST_CASE("MatrixGPU", "test") {
-	GPU::MAGMA::get_contoroller();
+	GPU::MAGMA::get_controller();
 
 	std::mt19937                         engine(0);
 	std::normal_distribution<RealScalar> dist(0.0, 1.0);

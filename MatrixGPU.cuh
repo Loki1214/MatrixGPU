@@ -41,33 +41,30 @@ namespace GPU {
 			MAGMA(MAGMA&&)                 = delete;
 			MAGMA& operator=(MAGMA&&)      = delete;
 
-			static MAGMA& get_contoroller() {
+			static MAGMA& get_controller() {
 				static MAGMA instance;
 				return instance;
 			}
 
-			static magma_queue_t const& queue() { return get_contoroller().m_queue; }
+			static magma_queue_t const& queue() { return get_controller().m_queue; }
 	};
 
+
+	// Complex number: Use cuda::std::complex<Real> both on Host and Devices.
+	//	Host:   Either std::complex<Real> or cuda::std::complex<Real>
+	//	Device: cuda::std::complex<Real>
 	template<typename Scalar_>
 	struct traits {
+			static_assert(!Eigen::NumTraits<Scalar_>::IsComplex);
 			using Scalar = Scalar_;
 	};
-	template<>
-	struct traits<std::complex<float>> {
-			using Scalar = magmaFloatComplex;
+	template<typename RealScalar>
+	struct traits< std::complex<RealScalar> > {
+			using Scalar = cuda::std::complex<RealScalar>;
 	};
-	template<>
-	struct traits<cuda::std::complex<float>> {
-			using Scalar = magmaFloatComplex;
-	};
-	template<>
-	struct traits<std::complex<double>> {
-			using Scalar = magmaDoubleComplex;
-	};
-	template<>
-	struct traits<cuda::std::complex<double>> {
-			using Scalar = magmaDoubleComplex;
+	template<typename RealScalar>
+	struct traits< cuda::std::complex<RealScalar> > {
+			using Scalar = cuda::std::complex<RealScalar>;
 	};
 
 	template<class MatrixCPU>

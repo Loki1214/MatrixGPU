@@ -41,18 +41,18 @@ namespace GPU {
 
 				MatrixCPU hmatCopy(hmat);
 				m_eigvals.resize(hmat.rows());
-				magma_geev_gpu(jobvl, jobvr, hmatCopy.rows(), hmatCopy.data(), hmatCopy.rows(),
-				               m_eigvals.data(), m_VL.data(), m_VL.rows(), m_VR.data(), m_VR.rows(),
-				               work.data(), -1, rwork.data(), &m_info);
+				magma_geev(jobvl, jobvr, hmatCopy.rows(), hmatCopy.data(), hmatCopy.rows(),
+				           m_eigvals.data(), m_VL.data(), m_VL.rows(), m_VR.data(), m_VR.rows(),
+				           work.data(), -1, rwork.data(), &m_info);
 				DEBUG(std::cerr << "#         hmatCopy.rows() = " << hmatCopy.rows() << std::endl);
 				DEBUG(std::cerr << "#         hmatCopy.cols() = " << hmatCopy.cols() << std::endl);
 				DEBUG(std::cerr << "# int(std::real(work[0])) = " << int(std::real(work[0]))
 				                << std::endl);
 				work.resize(int(std::real(work[0])));
 				DEBUG(std::cerr << "#             work.size() = " << work.size() << std::endl);
-				magma_geev_gpu(jobvl, jobvr, hmatCopy.rows(), hmatCopy.data(), hmatCopy.rows(),
-				               m_eigvals.data(), m_VL.data(), m_VL.rows(), m_VR.data(), m_VR.rows(),
-				               work.data(), work.size(), rwork.data(), &m_info);
+				magma_geev(jobvl, jobvr, hmatCopy.rows(), hmatCopy.data(), hmatCopy.rows(),
+				           m_eigvals.data(), m_VL.data(), m_VL.rows(), m_VR.data(), m_VR.rows(),
+				           work.data(), work.size(), rwork.data(), &m_info);
 				DEBUG(std::cerr << "# info = " << m_info << "\n" << std::endl);
 				return *this;
 			}

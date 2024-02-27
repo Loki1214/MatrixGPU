@@ -82,10 +82,10 @@ namespace Eigen {
 template<typename Index_, typename Scalar_>
 static inline void magma_axpy(Index_ n, Scalar_ alpha, Scalar_ const* dx, Index_ incx, Scalar_* dy,
                               Index_ incy, magma_queue_t queue) {
-	if constexpr(std::is_same_v<Scalar_, magmaFloatComplex>) {
+	if constexpr(std::is_same_v<Scalar_, cuda::std::complex<float>>) {
 		magma_caxpy(n, alpha, dx, incx, dy, incy, queue);
 	}
-	else if constexpr(std::is_same_v<Scalar_, magmaDoubleComplex>) {
+	else if constexpr(std::is_same_v<Scalar_, cuda::std::complex<double>>) {
 		magma_zaxpy(n, alpha, dx, incx, dy, incy, queue);
 	}
 	else {
@@ -123,10 +123,10 @@ static inline Scalar_ magma_dotc(Index_ n, Scalar_ const* dx, Index_ incx, Scala
 	else if constexpr(std::is_same_v<Scalar_, double>) {
 		return magma_ddot(n, dx, incx, dy, incy, queue);
 	}
-	else if constexpr(std::is_same_v<Scalar_, magmaFloatComplex>) {
+	else if constexpr(std::is_same_v<Scalar_, cuda::std::complex<float>>) {
 		return magma_cdotc(n, dx, incx, dy, incy, queue);
 	}
-	else if constexpr(std::is_same_v<Scalar_, magmaDoubleComplex>) {
+	else if constexpr(std::is_same_v<Scalar_, cuda::std::complex<double>>) {
 		return magma_zdotc(n, dx, incx, dy, incy, queue);
 	}
 	else {
@@ -149,10 +149,10 @@ static inline void magma_hemm(magma_side_t side, magma_uplo_t uplo, Index_ m, In
 	else if constexpr(std::is_same_v<Scalar_, double>) {
 		return magmablas_dsymm(side, uplo, m, n, alpha, dA, ldda, dB, lddb, beta, dC, lddc, queue);
 	}
-	else if constexpr(std::is_same_v<Scalar_, magmaFloatComplex>) {
+	else if constexpr(std::is_same_v<Scalar_, cuda::std::complex<float>>) {
 		return magma_chemm(side, uplo, m, n, alpha, dA, ldda, dB, lddb, beta, dC, lddc, queue);
 	}
-	else if constexpr(std::is_same_v<Scalar_, magmaDoubleComplex>) {
+	else if constexpr(std::is_same_v<Scalar_, cuda::std::complex<double>>) {
 		return magma_zhemm(side, uplo, m, n, alpha, dA, ldda, dB, lddb, beta, dC, lddc, queue);
 	}
 	else {
@@ -213,13 +213,13 @@ static inline Index1_ magma_heevd_gpu(magma_vec_t jobz, magma_uplo_t uplo, Index
 		return magma_dheevd_gpu(jobz, uplo, n, dA, ldda, w, wA, ldwa, work, lwork, rwork, lrwork,
 		                        reinterpret_cast<magma_int_t*>(iwork), liwork, info);
 	}
-	else if constexpr(std::is_same_v<Scalar_, magmaFloatComplex>) {
+	else if constexpr(std::is_same_v<Scalar_, cuda::std::complex<float>>) {
 		return magma_cheevd_gpu(jobz, uplo, n, reinterpret_cast<magmaFloatComplex*>(dA), ldda, w,
 		                        reinterpret_cast<magmaFloatComplex*>(wA), ldwa,
 		                        reinterpret_cast<magmaFloatComplex*>(work), lwork, rwork, lrwork,
 		                        reinterpret_cast<magma_int_t*>(iwork), liwork, info);
 	}
-	else if constexpr(std::is_same_v<Scalar_, magmaDoubleComplex>) {
+	else if constexpr(std::is_same_v<Scalar_, cuda::std::complex<double>>) {
 		return magma_zheevd_gpu(jobz, uplo, n, reinterpret_cast<magmaDoubleComplex*>(dA), ldda, w,
 		                        reinterpret_cast<magmaDoubleComplex*>(wA), ldwa,
 		                        reinterpret_cast<magmaDoubleComplex*>(work), lwork, rwork, lrwork,
@@ -236,7 +236,7 @@ static inline Index1_ magma_heevd_gpu(magma_vec_t jobz, magma_uplo_t uplo, Index
 
 template<typename Scalar_, typename Index1_, typename Index2_, typename Index3_, typename Index4_,
          typename Index5_, typename Index6_ >
-static inline Index1_ magma_geev_gpu(magma_vec_t jobvl, magma_vec_t jobvr, Index2_ n, Scalar_* A,
+static inline Index1_ magma_geev(magma_vec_t jobvl, magma_vec_t jobvr, Index2_ n, Scalar_* A,
                                      Index3_ ldda, Scalar_* w, Scalar_* VL, Index4_ ldvl,
                                      Scalar_* VR, Index5_ ldvr, Scalar_* work, Index6_ lwork,
                                      typename Eigen::NumTraits<Scalar_>::Real* rwork,
@@ -249,14 +249,14 @@ static inline Index1_ magma_geev_gpu(magma_vec_t jobvl, magma_vec_t jobvr, Index
 		return magma_dgeev(jobvl, jobvr, n, A, ldda, w, VL, ldvl, VR, ldvr, work, lwork, rwork,
 		                   info);
 	}
-	else if constexpr(std::is_same_v<Scalar_, std::complex<float> >) {
+	else if constexpr(std::is_convertible_v<Scalar_, std::complex<float> >) {
 		return magma_cgeev(jobvl, jobvr, n, reinterpret_cast<magmaFloatComplex*>(A), ldda,
 		                   reinterpret_cast<magmaFloatComplex*>(w),
 		                   reinterpret_cast<magmaFloatComplex*>(VL), ldvl,
 		                   reinterpret_cast<magmaFloatComplex*>(VR), ldvr,
 		                   reinterpret_cast<magmaFloatComplex*>(work), lwork, rwork, info);
 	}
-	else if constexpr(std::is_same_v<Scalar_, std::complex<double> >) {
+	else if constexpr(std::is_convertible_v<Scalar_, std::complex<double> >) {
 		return magma_zgeev(jobvl, jobvr, n, reinterpret_cast<magmaDoubleComplex*>(A), ldda,
 		                   reinterpret_cast<magmaDoubleComplex*>(w),
 		                   reinterpret_cast<magmaDoubleComplex*>(VL), ldvl,
