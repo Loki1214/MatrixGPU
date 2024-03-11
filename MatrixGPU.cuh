@@ -7,6 +7,13 @@
 #include <magma_v2.h>
 #include <iostream>
 
+#if __has_include(<omp.h>)
+	#include <omp.h>
+#else
+static inline omp_get_max_threads() { return 1; }
+static inline omp_get_thread_num() { return 0; }
+#endif
+
 namespace std {
 	float  real(magmaFloatComplex z) { return z.x; }
 	double real(magmaDoubleComplex z) { return z.x; }
@@ -15,7 +22,7 @@ namespace std {
 namespace GPU {
 	class MAGMA {
 		private:
-			magma_queue_t m_queue = NULL;
+			std::vector<magma_queue_t> m_queue;
 			MAGMA() {
 				DEBUG(std::cerr << "# Constructor: " << __func__ << std::endl);
 				size_t pValue;
@@ -27,10 +34,14 @@ namespace GPU {
 				std::cout << "#\t cudaLimitMallocHeapSize = " << pValue << std::endl;
 
 				magma_init();
-				magma_queue_create(0, &m_queue);
+				std::cout << "# omp_get_max_threads() = " << omp_get_max_threads() << std::endl;
+				m_queue.resize(omp_get_max_threads());
+#pragma omp parallel
+				magma_queue_create(0, &m_queue[omp_get_thread_num()]);
 			}
 			~MAGMA() {
-				magma_queue_destroy(m_queue);
+#pragma omp parallel
+				magma_queue_destroy(m_queue[omp_get_thread_num()]);
 				magma_finalize();
 				DEBUG(std::cerr << "# Destructor: " << __func__ << std::endl);
 			}
@@ -46,9 +57,8 @@ namespace GPU {
 				return instance;
 			}
 
-			static magma_queue_t const& queue() { return get_controller().m_queue; }
+			static magma_queue_t const& queue(int num = 0) { return get_controller().m_queue[num]; }
 	};
-
 
 	// Complex number: Use cuda::std::complex<Real> both on Host and Devices.
 	//	Host:   Either std::complex<Real> or cuda::std::complex<Real>

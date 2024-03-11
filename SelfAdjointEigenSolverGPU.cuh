@@ -26,14 +26,18 @@ namespace GPU {
 
 		public:
 			SelfAdjointEigenSolver() = default;
-			SelfAdjointEigenSolver(MatrixCPU const& hmat) { this->compute(hmat); }
+			SelfAdjointEigenSolver(MatrixCPU const& hmat, Eigen::DecompositionOptions option
+			                                              = Eigen::ComputeEigenvectors) {
+				this->compute(hmat, option);
+			}
 			MatrixCPU const&        eigenvectors() const { return m_eigvecs; }
 			VectorCPU const&        eigenvalues() const { return m_eigvals; }
-			SelfAdjointEigenSolver& compute(MatrixCPU const& hmat,
-			                                bool             computeEigenvectors = true) {
+			SelfAdjointEigenSolver& compute(MatrixCPU const&            hmat,
+			                                Eigen::DecompositionOptions option
+			                                = Eigen::ComputeEigenvectors) {
 				DEBUG(std::cerr << "# " << __func__ << std::endl);
-				magma_vec_t                jobz = (computeEigenvectors ? MagmaVec : MagmaNoVec);
-				magma_uplo_t               uplo = MagmaLower;
+				magma_vec_t  jobz = (option == Eigen::ComputeEigenvectors ? MagmaVec : MagmaNoVec);
+				magma_uplo_t uplo = MagmaLower;
 				Eigen::VectorX<ScalarCPU>  work(1);
 				Eigen::VectorX<RealScalar> rwork(1);
 				Eigen::VectorXi            iwork(1);
@@ -82,7 +86,10 @@ namespace GPU {
 
 		public:
 			SelfAdjointEigenSolver() = default;
-			SelfAdjointEigenSolver(MatrixGPU const& dmat) { this->compute(dmat); }
+			SelfAdjointEigenSolver(MatrixGPU const& dmat, Eigen::DecompositionOptions option
+			                                              = Eigen::ComputeEigenvectors) {
+				this->compute(dmat, option);
+			}
 			MatrixGPU const& eigenvectorsGPU() const { return m_eigvecs; }
 			MatrixCPU        eigenvectors() const {
                 MatrixCPU res(m_eigvecs.rows(), m_eigvecs.cols());
@@ -90,11 +97,12 @@ namespace GPU {
                 return res;
 			}
 			VectorCPU const&        eigenvalues() const { return m_eigvals; }
-			SelfAdjointEigenSolver& compute(MatrixGPU const& dmat,
-			                                bool             computeEigenvectors = true) {
+			SelfAdjointEigenSolver& compute(MatrixGPU const&            dmat,
+			                                Eigen::DecompositionOptions option
+			                                = Eigen::ComputeEigenvectors) {
 				DEBUG(std::cerr << "# " << __func__ << std::endl);
-				magma_vec_t                jobz = (computeEigenvectors ? MagmaVec : MagmaNoVec);
-				magma_uplo_t               uplo = MagmaLower;
+				magma_vec_t  jobz = (option == Eigen::ComputeEigenvectors ? MagmaVec : MagmaNoVec);
+				magma_uplo_t uplo = MagmaLower;
 				Eigen::MatrixX<ScalarGPU>  wA(dmat.rows(), dmat.cols());
 				Eigen::VectorX<ScalarGPU>  work(1);
 				Eigen::VectorX<RealScalar> rwork(1);
