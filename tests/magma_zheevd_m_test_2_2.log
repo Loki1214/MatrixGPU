@@ -1,0 +1,8 @@
+#	 ngpus = 6
+## Preparing a matrix on CPU.
+## Generated random numbers.
+## Prepared a matrix on CPU.	 T_pre = 30.2869 (sec)
+#	  lwork = 2748800040
+#	 lrwork = 5497652509
+#	 liwork = 262143
+#	 info = 0

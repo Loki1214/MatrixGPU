@@ -1,0 +1,50 @@
+FROM intel/oneapi-basekit:devel-ubuntu22.04
+FROM nvidia/cuda:12.3.1-devel-ubuntu22.04
+ENV CUDADIR=/usr/local/cuda
+
+# Install Intel oneAPI
+COPY --from=0 /opt/intel/ /opt/intel/
+
+# Proxy settings for apt inside the container
+RUN echo Acquire::ftp::proxy   "\"${http_proxy}\";"  >  /etc/apt/apt.conf
+RUN echo Acquire::http::proxy  "\"${https_proxy}\";" >> /etc/apt/apt.conf
+RUN echo Acquire::https::proxy "\"${http_proxy}\";"  >> /etc/apt/apt.conf
+
+# Install basic tools
+RUN apt-get update
+RUN apt-get install -y sudo wget htop zsh vim screen ca-certificates gpg
+
+# Install developer tools
+RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - > /usr/share/keyrings/kitware-archive-keyring.gpg
+RUN echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ jammy main' > /etc/apt/sources.list.d/kitware.list
+RUN apt-get update
+RUN apt-get install -y build-essential git clang-format python3-pip
+RUN apt-get install -y cmake libeigen3-dev
+RUN apt-get -y upgrade
+
+# Build MAGMA
+RUN wget https://icl.utk.edu/projectsfiles/magma/downloads/magma-2.7.2.tar.gz
+RUN tar -xf magma-2.7.2.tar.gz
+RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh && \
+	cd magma-2.7.2 && mkdir -p build && cd build && \
+	cmake -DUSE_FORTRAN=OFF -DMAGMA_ENABLE_CUDA=ON -DGPU_TARGET='Volta Turing Ampere' .. && make -j 30 && make -j 30 install"
+RUN sed 's/^Cflags: .*$/Cflags: -isystem ${includedir} -DADD_/' -i /usr/local/magma/lib/pkgconfig/magma.pc
+RUN rm -rf magma-2.7.2 magma-2.7.2.tar.gz
+ENV PKG_CONFIG_PATH=/usr/local/magma/lib/pkgconfig
+
+RUN chsh -s /bin/zsh root
+
+ARG USER=dev
+ARG UID=${UID}
+ARG GID=${GID}
+RUN useradd ${USER} --uid=${UID} --gid=${GID}
+RUN echo "${USER}:ubuntu" | chpasswd
+RUN usermod -aG sudo ${USER}
+RUN mkdir -p /home/${USER} && chown ${USER} /home/${USER}
+RUN mkdir -p /work && chown ${USER} /work
+
+RUN chsh -s /bin/zsh ${USER}
+USER ${USER}
+WORKDIR /work
+RUN touch /home/${USER}/.zshrc
+CMD ["/bin/zsh"]

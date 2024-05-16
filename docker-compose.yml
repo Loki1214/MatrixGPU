@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  devel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - http_proxy=${HTTP_PROXY}
+        - https_proxy=${HTTPS_PROXY}
+        - no_proxy=${NO_PROXY}
+    tty: true
+    volumes:
+      - type: bind
+        source: .
+        target: /work
+      - type: bind
+        source: ${HOME}/data
+        target: ${HOME}/data
+      - type: bind
+        source: ${HOME}/.zshrc
+        target: ${HOME}/.zshrc
+      - type: bind
+        source: ${HOME}/.zhistory
+        target: ${HOME}/.zhistory
+      - type: bind
+        source: /etc/zshenv
+        target: /etc/zsh/zshenv
+      - type: bind
+        source: /etc/zshrc
+        target: /etc/zsh/zshrc
+    deploy:
+      resources:
+        reservations:
+          devices:
+            # NVIDIA Devices
+            - driver: cdi
+              deviceIDs:
+                - nvidia.com/gpu=all
+                - nvidia.com/gds=all
+                - nvidia.com/mofed=all

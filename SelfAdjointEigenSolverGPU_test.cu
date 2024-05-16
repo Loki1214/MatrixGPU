@@ -1,8 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 #include "MatrixGPU"
+#include "tests/error.hpp"
+#include "tests/generateRandomMatrix.hpp"
 #include <Eigen/Dense>
 #include <iostream>
-#include <random>
 
 #ifdef FLOAT
 using RealScalar = float;
@@ -19,18 +20,13 @@ TEST_CASE("MatrixGPU", "test") {
 #endif
 	GPU::MAGMA::get_controller();
 
-	std::random_device                   seed_gen;
-	std::mt19937                         engine(seed_gen());
-	std::normal_distribution<RealScalar> dist(0.0, 1.0);
-
 	constexpr int dim
 	    = 14602;  // Dimension of the zero momentum sector for Spin systems with L = 18
-	Eigen::MatrixX<ScalarCPU> mat = Eigen::MatrixX<ScalarCPU>::NullaryExpr(
-	    dim, dim, [&]() { return ScalarCPU(dist(engine), dist(engine)); });
-	mat = (mat + mat.adjoint()).eval();
-	mat /= std::sqrt(mat.norm());
-	std::cout << "## Prepared a matrix on CPU." << std::endl;
+	Eigen::MatrixX<ScalarCPU> mat(dim, dim);
+	GPU::internal::generateRandomMatrix(mat, dim);
+	std::cout << "## Preparing a matrix on GPU." << std::endl;
 	GPU::MatrixGPU<decltype(mat)> dmat(mat);
+	std::cout << "## Prepared a matrix on GPU." << std::endl;
 	REQUIRE(dmat.rows() == dim);
 	REQUIRE(dmat.cols() == dim);
 
@@ -38,35 +34,39 @@ TEST_CASE("MatrixGPU", "test") {
 	{
 		std::cout << "## Enter point 1" << std::endl;
 		GPU::SelfAdjointEigenSolver<decltype(mat)> hsolver(mat);
-		Eigen::MatrixX<ScalarCPU>                  eigVecs = hsolver.eigenvectors();
-		auto const diff = (mat * eigVecs - eigVecs * hsolver.eigenvalues().asDiagonal()).norm();
+		auto const                                 diff
+		    = GPU::internal::diagError(mat, hsolver.eigenvectors(), hsolver.eigenvalues());
 		REQUIRE(diff < precision);
+		std::cout << "## diff = " << diff << std::endl;
 		std::cout << "## Passed point 1" << std::endl;
 	}
 	{
 		std::cout << "## Enter point 2" << std::endl;
 		GPU::SelfAdjointEigenSolver<decltype(mat)> hsolver;
 		hsolver.compute(mat);
-		Eigen::MatrixX<ScalarCPU> eigVecs = hsolver.eigenvectors();
-		auto const diff = (mat * eigVecs - eigVecs * hsolver.eigenvalues().asDiagonal()).norm();
+		auto const diff
+		    = GPU::internal::diagError(mat, hsolver.eigenvectors(), hsolver.eigenvalues());
 		REQUIRE(diff < precision);
+		std::cout << "## diff = " << diff << std::endl;
 		std::cout << "## Passed point 2" << std::endl;
 	}
 	{
 		std::cout << "## Enter point 3" << std::endl;
 		GPU::SelfAdjointEigenSolver<decltype(dmat)> dsolver(dmat);
-		Eigen::MatrixX<ScalarCPU>                   eigVecs = dsolver.eigenvectors();
-		auto const diff = (mat * eigVecs - eigVecs * dsolver.eigenvalues().asDiagonal()).norm();
+		auto const                                  diff
+		    = GPU::internal::diagError(mat, dsolver.eigenvectors(), dsolver.eigenvalues());
 		REQUIRE(diff < precision);
+		std::cout << "## diff = " << diff << std::endl;
 		std::cout << "## Passed point 3" << std::endl;
 	}
 	{
 		std::cout << "## Enter point 4" << std::endl;
 		GPU::SelfAdjointEigenSolver<decltype(dmat)> dsolver;
 		dsolver.compute(dmat);
-		auto const& eigVecs = dsolver.eigenvectors();
-		auto const  diff    = (mat * eigVecs - eigVecs * dsolver.eigenvalues().asDiagonal()).norm();
+		auto const                                  diff
+		    = GPU::internal::diagError(mat, dsolver.eigenvectors(), dsolver.eigenvalues());
 		REQUIRE(diff < precision);
+		std::cout << "## diff = " << diff << std::endl;
 		std::cout << "## Passed point 4" << std::endl;
 	}
 }

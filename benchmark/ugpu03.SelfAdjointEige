@@ -1,0 +1,43 @@
+# EIGEN_USE_MKL_ALL is NOT set.
+#	 cudaLimitMallocHeapSize = 8388608
+#	 cudaLimitMallocHeapSize = 17681179680
+#	 ngpus = 8
+#	 omp_get_max_threads() = 48
+# /work/benchmark/SelfAdjointEigenSolver_mgpu.cu
+# LMax = 22, LMin = 20, Nsample = 10
+# L = 20, dim = 52428
+# dim * dim = 2748695184
+## Prepared a matrix on CPU.	 norm = 1.048584e+05	 T_pre = 5.11735 (sec)
+## error = 3.13271e-14, Tdiag = 959.324 (sec)
+## Calculated the error. T_err = 734.863 (sec)
+## Prepared a matrix on CPU.	 norm = 1.048553e+05	 T_pre = 5.04056 (sec)
+## error = 3.13401e-14, Tdiag = 1877.48 (sec)
+## Calculated the error. T_err = 753.722 (sec)
+## Prepared a matrix on CPU.	 norm = 1.048573e+05	 T_pre = 5.45192 (sec)
+## error = 3.13167e-14, Tdiag = 2804.17 (sec)
+## Calculated the error. T_err = 777.243 (sec)
+## Prepared a matrix on CPU.	 norm = 1.048561e+05	 T_pre = 5.54525 (sec)
+## error = 3.13475e-14, Tdiag = 3725.35 (sec)
+## Calculated the error. T_err = 738.553 (sec)
+## Prepared a matrix on CPU.	 norm = 1.048566e+05	 T_pre = 5.78148 (sec)
+## error = 3.13323e-14, Tdiag = 4657.47 (sec)
+## Calculated the error. T_err = 755.871 (sec)
+## Prepared a matrix on CPU.	 norm = 1.048555e+05	 T_pre = 5.60415 (sec)
+## error = 3.13625e-14, Tdiag = 5577.49 (sec)
+## Calculated the error. T_err = 767.634 (sec)
+## Prepared a matrix on CPU.	 norm = 1.048587e+05	 T_pre = 6.22221 (sec)
+## error = 3.13064e-14, Tdiag = 6513.85 (sec)
+## Calculated the error. T_err = 758.245 (sec)
+## Prepared a matrix on CPU.	 norm = 1.048539e+05	 T_pre = 5.37832 (sec)
+## error = 3.13684e-14, Tdiag = 7429.32 (sec)
+## Calculated the error. T_err = 763.158 (sec)
+## Prepared a matrix on CPU.	 norm = 1.048564e+05	 T_pre = 5.98286 (sec)
+## error = 3.13472e-14, Tdiag = 8347.41 (sec)
+## Calculated the error. T_err = 759.689 (sec)
+## Prepared a matrix on CPU.	 norm = 1.048564e+05	 T_pre = 5.90966 (sec)
+## error = 3.13156e-14, Tdiag = 9261.78 (sec)
+## Calculated the error. T_err = 755.04 (sec)
+52428 9.261779e+02 3.133640e-14 3.136844e-14
+# L = 21, dim = 99864
+# dim * dim = 9972818496
+## Prepared a matrix on CPU.	 norm = 1.997280e+05	 T_pre = 21.1643 (sec)

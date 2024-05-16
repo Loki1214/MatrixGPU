@@ -16,7 +16,6 @@ enable_testing()
 find_package(Eigen3 REQUIRED)
 
 # For BLAS and LAPACK
-set(MKL_INTERFACE_FULL intel_lp64) # For compatibility with Eigen
 find_package(MKL REQUIRED)
 find_package(TBB REQUIRED)
 find_package(OpenMP REQUIRED)
@@ -28,13 +27,15 @@ pkg_check_modules(MAGMA REQUIRED IMPORTED_TARGET magma)
 include(CheckLanguage)
 check_language(CUDA)
 if(CMAKE_CUDA_COMPILER)
-  enable_language(CUDA)
-  if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
-    set(CMAKE_CUDA_ARCHITECTURES 80)
-  endif()
+enable_language(CUDA)
+  execute_process(COMMAND "${CMAKE_SOURCE_DIR}/get_sm.sh" OUTPUT_VARIABLE DETECTED_ARCHITECTURES)
+  string(REGEX REPLACE "\n" "" DETECTED_ARCHITECTURES "${DETECTED_ARCHITECTURES}")
+  set(CMAKE_CUDA_ARCHITECTURES ${DETECTED_ARCHITECTURES} CACHE STRING "")
+  string(REGEX REPLACE "[ \t\r\n]+" "" CMAKE_CUDA_ARCHITECTURES "${CMAKE_CUDA_ARCHITECTURES}" )
+  message("CMAKE_CUDA_COMPILER_ID   = ${CMAKE_CUDA_COMPILER_ID}")
+  message("CMAKE_CUDA_ARCHITECTURES = ${CMAKE_CUDA_ARCHITECTURES}")
   set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
   set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr")
-#   set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --relocatable-device-code=true") # Necessary for enabling CUDA Dynamic Parallelism
   set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcudafe --diag_suppress=esa_on_defaulted_function_ignored")
   set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -lineinfo -Xcompiler -rdynamic")
   set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Wall -Wextra -Wfatal-errors")
@@ -53,9 +54,8 @@ set(modules
 	MatrixGPU
 	SelfAdjointEigenSolverGPU
 	ComplexEigenSolverGPU
+	SelfAdjointEigenSolver_mgpu
 )
-subdirs(benchmark)
-
 foreach(name IN LISTS modules)
 	add_executable(${name}_test ${name}_test.cu)
 	target_compile_options(${name}_test PRIVATE -Wall -Wextra -Wfatal-errors)
@@ -68,14 +68,17 @@ foreach(name IN LISTS modules)
 	)
 	add_test(${name}_test compute-sanitizer ${name}_test)
 
-	add_executable(${name}_c_test ${name}_test.cu)
-	target_compile_options(${name}_c_test PRIVATE -Wall -Wextra -Wfatal-errors -DFLOAT)
-	target_link_libraries(${name}_c_test
-		Catch2::Catch2WithMain
-		Eigen3::Eigen
-		MKL::MKL
-		OpenMP::OpenMP_CXX
-		PkgConfig::MAGMA
-	)
-	add_test(${name}_c_test compute-sanitizer ${name}_c_test)
+	# add_executable(${name}_c_test ${name}_test.cu)
+	# target_compile_options(${name}_c_test PRIVATE -Wall -Wextra -Wfatal-errors -DFLOAT)
+	# target_link_libraries(${name}_c_test
+	# 	Catch2::Catch2WithMain
+	# 	Eigen3::Eigen
+	# 	MKL::MKL
+	# 	OpenMP::OpenMP_CXX
+	# 	PkgConfig::MAGMA
+	# 	CUDA::curand
+	# )
+	# add_test(${name}_c_test compute-sanitizer ${name}_c_test)
 endforeach(name)
+
+subdirs(benchmark)

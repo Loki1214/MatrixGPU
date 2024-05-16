@@ -1,4 +1,5 @@
 #include "macros.hpp"
+#include "tests/generateRandomMatrix.hpp"
 #include <Eigen/Dense>
 #include <complex>
 #include <iostream>
@@ -20,6 +21,9 @@ using RealScalar = double;
 using Scalar = std::complex<RealScalar>;
 
 int main(int argc, char** argv) {
+#ifdef EIGEN_USE_MKL_ALL
+	std::cout << "EIGEN_USE_MKL_ALL is set" << std::endl;
+#endif
 	if(argc < 5) {
 		std::cerr << "Usage: 0.(This) 1.(dimMin) 2.(dimMax) 3.(step) 4.(Nsample)\n";
 		std::cerr << "argc = " << argc << std::endl;
@@ -31,17 +35,16 @@ int main(int argc, char** argv) {
 	int const step    = std::atoi(argv[3]);
 	int const Nsample = std::atoi(argv[4]);
 
-	std::mt19937                         engine(0);
-	std::normal_distribution<RealScalar> dist(0.0, 1.0);
-	Eigen::MatrixX<Scalar>               mat;
+	Eigen::initParallel();
+	// std::mt19937                         engine(0);
+	// std::normal_distribution<RealScalar> dist(0.0, 1.0);
 
 	for(auto dim = dimMin; dim <= dimMax; dim += step) {
-		double          start, elapsed = 0.0;
-		Eigen::VectorXd error(Nsample);
+		Eigen::MatrixX<Scalar> mat(dim, dim);
+		double                 start, elapsed = 0.0;
+		Eigen::VectorXd        error(Nsample);
 		for(auto i = 0; i < Nsample; ++i) {
-			mat = Eigen::MatrixX<Scalar>::NullaryExpr(
-			    dim, dim, [&]() { return Scalar(dist(engine), dist(engine)); });
-			mat = (mat + mat.adjoint()).eval();
+			GPU::internal::generateRandomMatrix(mat, dim);
 
 			start = getETtime();
 			Eigen::SelfAdjointEigenSolver< decltype(mat) > solver(mat);

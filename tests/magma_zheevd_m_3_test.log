@@ -1,0 +1,14 @@
+#	 ngpus = 8
+# dim = 52428
+# dim * dim = 2748695184
+## Preparing a matrix on CPU.
+## Generated random numbers.
+## norm = 104855
+## Prepared a matrix on CPU.
+#	  lwork = 2748800040
+#	 lrwork = 5497652509
+#	 liwork = 262143
+#	 info = 0
+# error = 9.81575e-28
+./magma_zheevd_m_3_test 2>&1  58903.60s user 1002.51s system 3252% cpu 30:42.03 total
+tee magma_zheevd_m_3_test.log  0.00s user 0.00s system 0% cpu 30:40.85 total

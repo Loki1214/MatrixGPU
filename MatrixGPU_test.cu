@@ -1,8 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
-#include "MatrixGPU.cuh"
+#include "MatrixGPU"
+#include "tests/error.hpp"
+#include "tests/generateRandomMatrix.hpp"
 #include <Eigen/Dense>
 #include <iostream>
-#include <random>
 
 #ifdef FLOAT
 using RealScalar = float;
@@ -17,8 +18,8 @@ TEST_CASE("MatrixGPU", "test") {
 
 	constexpr double       precision = 1.0E-10;
 	constexpr int          dim       = 1000;
-	Eigen::MatrixX<Scalar> mat       = Eigen::MatrixX<Scalar>::NullaryExpr(
-        dim, dim, [&]() { return Scalar(dist(engine), dist(engine)); });
+	Eigen::MatrixX<Scalar> mat(dim, dim);
+	GPU::internal::generateRandomMatrix(mat, dim);
 	REQUIRE(mat.norm() > precision);
 	GPU::MatrixGPU<decltype(mat)> dmat(mat);
 	REQUIRE(mat.rows() == dmat.rows());

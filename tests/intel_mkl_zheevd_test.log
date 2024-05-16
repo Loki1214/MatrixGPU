@@ -1,0 +1,13 @@
+# dim = 52428
+# dim * dim = 2748695184
+## Preparing a matrix on CPU.
+## Generated random numbers.
+## norm = 104857
+## Prepared a matrix on CPU.
+#	  lwork = 2750425308
+#	 lrwork = 5497652509
+#	 liwork = 262143
+#	 info = 0
+# error = 1.74949e-14
+./intel_mkl_zheevd_test 2>&1  390875.16s user 3702.70s system 4607% cpu 2:22:43.11 total
+tee intel_mkl_zheevd_test.log  0.00s user 0.00s system 0% cpu 2:22:43.10 total

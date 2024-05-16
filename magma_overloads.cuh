@@ -79,9 +79,9 @@ namespace Eigen {
 }  // namespace Eigen
 
 // MAGMA_BLAS
-template<typename Index_, typename Scalar_>
-static inline void magma_axpy(Index_ n, Scalar_ alpha, Scalar_ const* dx, Index_ incx, Scalar_* dy,
-                              Index_ incy, magma_queue_t queue) {
+template<typename Scalar_>
+static inline void magma_axpy(magma_int_t n, Scalar_ alpha, Scalar_ const* dx, magma_int_t incx,
+                              Scalar_* dy, magma_int_t incy, magma_queue_t queue) {
 	if constexpr(std::is_same_v<Scalar_, cuda::std::complex<float>>) {
 		magma_caxpy(n, alpha, dx, incx, dy, incy, queue);
 	}
@@ -114,9 +114,9 @@ static inline void magma_axpy(Index_ n, Scalar_ alpha, Scalar_ const* dx, Index_
 //  return magmablas_zhemv_work(Uplo, n, alpha, dA.ptr(), dA.LD(), dx, incx, beta, dy, incy, dwork, lwork, queue);
 // }
 
-template<typename Index_, typename Scalar_>
-static inline Scalar_ magma_dotc(Index_ n, Scalar_ const* dx, Index_ incx, Scalar_ const* dy,
-                                 Index_ incy, magma_queue_t queue) {
+template<typename Scalar_>
+static inline Scalar_ magma_dotc(magma_int_t n, Scalar_ const* dx, magma_int_t incx,
+                                 Scalar_ const* dy, magma_int_t incy, magma_queue_t queue) {
 	if constexpr(std::is_same_v<Scalar_, float>) {
 		return magma_sdot(n, dx, incx, dy, incy, queue);
 	}
@@ -142,10 +142,10 @@ static inline Scalar_ magma_dotc(Index_ n, Scalar_ const* dx, Index_ incx, Scala
 	return 0;
 }
 
-template<typename Index_, typename Scalar_>
-static inline void magma_hemm(magma_side_t side, magma_uplo_t uplo, Index_ m, Index_ n,
-                              Scalar_ alpha, Scalar_ const* dA, Index_ ldda, Scalar_ const* dB,
-                              Index_ lddb, Scalar_ beta, Scalar_* dC, Index_ lddc,
+template<typename Scalar_>
+static inline void magma_hemm(magma_side_t side, magma_uplo_t uplo, magma_int_t m, magma_int_t n,
+                              Scalar_ alpha, Scalar_ const* dA, magma_int_t ldda, Scalar_ const* dB,
+                              magma_int_t lddb, Scalar_ beta, Scalar_* dC, magma_int_t lddc,
                               magma_queue_t queue) {
 	if constexpr(std::is_same_v<Scalar_, float>) {
 		return magmablas_ssymm(side, uplo, m, n, alpha, dA, ldda, dB, lddb, beta, dC, lddc, queue);
@@ -175,30 +175,31 @@ static inline void magma_hemm(magma_side_t side, magma_uplo_t uplo, Index_ m, In
 }
 
 // MAGMA_LAPACK
-template<typename Scalar_, typename Index1_, typename Index2_, typename Index3_, typename Index4_,
-         typename Index5_, typename Index6_, typename Index7_ >
-static inline Index1_ magma_heevd(magma_vec_t jobz, magma_uplo_t uplo, Index2_ n, Scalar_* A,
-                                  Index3_ lda, typename Eigen::NumTraits<Scalar_>::Real* w,
-                                  Scalar_* work, Index4_ lwork,
-                                  typename Eigen::NumTraits<Scalar_>::Real* rwork, Index5_ lrwork,
-                                  Index6_* iwork, Index7_ liwork, Index1_* info) {
+template<typename Scalar_>
+static inline magma_int_t magma_heevd(magma_vec_t jobz, magma_uplo_t uplo, magma_int_t n,
+                                      Scalar_* A, magma_int_t lda,
+                                      typename Eigen::NumTraits<Scalar_>::Real* w, Scalar_* work,
+                                      magma_int_t                               lwork,
+                                      typename Eigen::NumTraits<Scalar_>::Real* rwork,
+                                      magma_int_t lrwork, magma_int_t* iwork, magma_int_t liwork,
+                                      magma_int_t* info) {
 	if constexpr(std::is_same_v<Scalar_, float>) {
-		return magma_sheevd(jobz, uplo, n, A, lda, w, work, lwork, rwork, lrwork,
-		                    reinterpret_cast<magma_int_t*>(iwork), liwork, info);
+		return magma_sheevd(jobz, uplo, n, A, lda, w, work, lwork, rwork, lrwork, iwork, liwork,
+		                    info);
 	}
 	else if constexpr(std::is_same_v<Scalar_, double>) {
-		return magma_dheevd(jobz, uplo, n, A, lda, w, work, lwork, rwork, lrwork,
-		                    reinterpret_cast<magma_int_t*>(iwork), liwork, info);
+		return magma_dheevd(jobz, uplo, n, A, lda, w, work, lwork, rwork, lrwork, iwork, liwork,
+		                    info);
 	}
 	else if constexpr(std::is_convertible_v<Scalar_, std::complex<float>>) {
 		return magma_cheevd(jobz, uplo, n, reinterpret_cast<magmaFloatComplex*>(A), lda, w,
-		                    reinterpret_cast<magmaFloatComplex*>(work), lwork, rwork, lrwork,
-		                    reinterpret_cast<magma_int_t*>(iwork), liwork, info);
+		                    reinterpret_cast<magmaFloatComplex*>(work), lwork, rwork, lrwork, iwork,
+		                    liwork, info);
 	}
 	else if constexpr(std::is_convertible_v<Scalar_, std::complex<double>>) {
 		return magma_zheevd(jobz, uplo, n, reinterpret_cast<magmaDoubleComplex*>(A), lda, w,
 		                    reinterpret_cast<magmaDoubleComplex*>(work), lwork, rwork, lrwork,
-		                    reinterpret_cast<magma_int_t*>(iwork), liwork, info);
+		                    iwork, liwork, info);
 	}
 	else {
 		static_assert([] { return false; }(),
@@ -209,14 +210,14 @@ static inline Index1_ magma_heevd(magma_vec_t jobz, magma_uplo_t uplo, Index2_ n
 	return EXIT_SUCCESS;
 }
 
-template<typename Scalar_, typename Index1_, typename Index2_, typename Index3_, typename Index4_,
-         typename Index5_, typename Index6_, typename Index7_, typename Index8_ >
-static inline Index1_ magma_heevd_gpu(magma_vec_t jobz, magma_uplo_t uplo, Index2_ n, Scalar_* dA,
-                                      Index3_ ldda, typename Eigen::NumTraits<Scalar_>::Real* w,
-                                      Scalar_* wA, Index4_ ldwa, Scalar_* work, Index5_ lwork,
-                                      typename Eigen::NumTraits<Scalar_>::Real* rwork,
-                                      Index6_ lrwork, Index7_* iwork, Index8_ liwork,
-                                      Index1_* info) {
+template<typename Scalar_>
+static inline magma_int_t magma_heevd_gpu(magma_vec_t jobz, magma_uplo_t uplo, magma_int_t n,
+                                          Scalar_* dA, magma_int_t ldda,
+                                          typename Eigen::NumTraits<Scalar_>::Real* w, Scalar_* wA,
+                                          magma_int_t ldwa, Scalar_* work, magma_int_t lwork,
+                                          typename Eigen::NumTraits<Scalar_>::Real* rwork,
+                                          magma_int_t lrwork, magma_int_t* iwork,
+                                          magma_int_t liwork, magma_int_t* info) {
 	if constexpr(std::is_same_v<Scalar_, float>) {
 		return magma_sheevd_gpu(jobz, uplo, n, dA, ldda, w, wA, ldwa, work, lwork, rwork, lrwork,
 		                        reinterpret_cast<magma_int_t*>(iwork), liwork, info);
@@ -246,29 +247,30 @@ static inline Index1_ magma_heevd_gpu(magma_vec_t jobz, magma_uplo_t uplo, Index
 	return EXIT_SUCCESS;
 }
 
-template<typename Scalar_, typename Index1_, typename Index2_, typename Index3_, typename Index4_,
-         typename Index5_, typename Index6_ >
-static inline Index1_ magma_geev(magma_vec_t jobvl, magma_vec_t jobvr, Index2_ n, Scalar_* A,
-                                 Index3_ ldda, Scalar_* w, Scalar_* VL, Index4_ ldvl, Scalar_* VR,
-                                 Index5_ ldvr, Scalar_* work, Index6_ lwork,
-                                 typename Eigen::NumTraits<Scalar_>::Real* rwork, Index1_* info) {
+template<typename Scalar_>
+static inline magma_int_t magma_geev(magma_vec_t jobvl, magma_vec_t jobvr, magma_int_t n,
+                                     Scalar_* A, magma_int_t lda, Scalar_* w, Scalar_* VL,
+                                     magma_int_t ldvl, Scalar_* VR, magma_int_t ldvr, Scalar_* work,
+                                     magma_int_t                               lwork,
+                                     typename Eigen::NumTraits<Scalar_>::Real* rwork,
+                                     magma_int_t*                              info) {
 	if constexpr(std::is_same_v<Scalar_, float>) {
-		return magma_sgeev(jobvl, jobvr, n, A, ldda, w, VL, ldvl, VR, ldvr, work, lwork, rwork,
+		return magma_sgeev(jobvl, jobvr, n, A, lda, w, VL, ldvl, VR, ldvr, work, lwork, rwork,
 		                   info);
 	}
 	else if constexpr(std::is_same_v<Scalar_, double>) {
-		return magma_dgeev(jobvl, jobvr, n, A, ldda, w, VL, ldvl, VR, ldvr, work, lwork, rwork,
+		return magma_dgeev(jobvl, jobvr, n, A, lda, w, VL, ldvl, VR, ldvr, work, lwork, rwork,
 		                   info);
 	}
 	else if constexpr(std::is_convertible_v<Scalar_, std::complex<float> >) {
-		return magma_cgeev(jobvl, jobvr, n, reinterpret_cast<magmaFloatComplex*>(A), ldda,
+		return magma_cgeev(jobvl, jobvr, n, reinterpret_cast<magmaFloatComplex*>(A), lda,
 		                   reinterpret_cast<magmaFloatComplex*>(w),
 		                   reinterpret_cast<magmaFloatComplex*>(VL), ldvl,
 		                   reinterpret_cast<magmaFloatComplex*>(VR), ldvr,
 		                   reinterpret_cast<magmaFloatComplex*>(work), lwork, rwork, info);
 	}
 	else if constexpr(std::is_convertible_v<Scalar_, std::complex<double> >) {
-		return magma_zgeev(jobvl, jobvr, n, reinterpret_cast<magmaDoubleComplex*>(A), ldda,
+		return magma_zgeev(jobvl, jobvr, n, reinterpret_cast<magmaDoubleComplex*>(A), lda,
 		                   reinterpret_cast<magmaDoubleComplex*>(w),
 		                   reinterpret_cast<magmaDoubleComplex*>(VL), ldvl,
 		                   reinterpret_cast<magmaDoubleComplex*>(VR), ldvr,
@@ -277,6 +279,41 @@ static inline Index1_ magma_geev(magma_vec_t jobvl, magma_vec_t jobvr, Index2_ n
 	else {
 		static_assert([] { return false; }(),
 		              "Error: magma_geevd_gpu for the input scalar type is NOT implemented.");
+	}
+	// To suppress wrong compiler warning "warning: missing return statement at end of non-void function"
+	// Never be executed
+	return EXIT_SUCCESS;
+}
+
+template<typename Scalar_>
+static inline magma_int_t magma_heevd_m(magma_int_t ngpu, magma_vec_t jobz, magma_uplo_t uplo,
+                                        magma_int_t n, Scalar_* A, magma_int_t lda,
+                                        typename Eigen::NumTraits<Scalar_>::Real* w, Scalar_* work,
+                                        magma_int_t                               lwork,
+                                        typename Eigen::NumTraits<Scalar_>::Real* rwork,
+                                        magma_int_t lrwork, magma_int_t* iwork, magma_int_t liwork,
+                                        magma_int_t* info) {
+	if constexpr(std::is_same_v<Scalar_, float>) {
+		return magma_sheevd_m(ngpu, jobz, uplo, n, A, lda, w, work, lwork, rwork, lrwork, iwork,
+		                      liwork, info);
+	}
+	else if constexpr(std::is_same_v<Scalar_, double>) {
+		return magma_dheevd_m(ngpu, jobz, uplo, n, A, lda, w, work, lwork, rwork, lrwork, iwork,
+		                      liwork, info);
+	}
+	else if constexpr(std::is_same_v<Scalar_, std::complex<float>>) {
+		return magma_cheevd_m(ngpu, jobz, uplo, n, reinterpret_cast<magmaFloatComplex*>(A), lda, w,
+		                      reinterpret_cast<magmaFloatComplex*>(work), lwork, rwork, lrwork,
+		                      iwork, liwork, info);
+	}
+	else if constexpr(std::is_same_v<Scalar_, std::complex<double>>) {
+		return magma_zheevd_m(ngpu, jobz, uplo, n, reinterpret_cast<magmaDoubleComplex*>(A), lda, w,
+		                      reinterpret_cast<magmaDoubleComplex*>(work), lwork, rwork, lrwork,
+		                      iwork, liwork, info);
+	}
+	else {
+		static_assert([] { return false; }(),
+		              "Error: magma_heevd_m for the input scalar type is NOT implemented.");
 	}
 	// To suppress wrong compiler warning "warning: missing return statement at end of non-void function"
 	// Never be executed

@@ -22,7 +22,9 @@ namespace std {
 namespace GPU {
 	class MAGMA {
 		private:
+			int                        m_ngpus = 0;
 			std::vector<magma_queue_t> m_queue;
+
 			MAGMA() {
 				DEBUG(std::cerr << "# Constructor: " << __func__ << std::endl);
 				size_t pValue;
@@ -32,9 +34,11 @@ namespace GPU {
 				cuCHECK(cudaDeviceSetLimit(cudaLimitMallocHeapSize, pValue));
 				cuCHECK(cudaDeviceGetLimit(&pValue, cudaLimitMallocHeapSize));
 				std::cout << "#\t cudaLimitMallocHeapSize = " << pValue << std::endl;
-
 				magma_init();
-				std::cout << "# omp_get_max_threads() = " << omp_get_max_threads() << std::endl;
+				cuCHECK(cudaGetDeviceCount(&m_ngpus));
+				std::cout << "#\t ngpus = " << m_ngpus << std::endl;
+
+				std::cout << "#\t omp_get_max_threads() = " << omp_get_max_threads() << std::endl;
 				m_queue.resize(omp_get_max_threads());
 #pragma omp parallel
 				magma_queue_create(0, &m_queue[omp_get_thread_num()]);
@@ -57,6 +61,7 @@ namespace GPU {
 				return instance;
 			}
 
+			static int                  ngpus() { return get_controller().m_ngpus; }
 			static magma_queue_t const& queue(int num = 0) { return get_controller().m_queue[num]; }
 	};
 

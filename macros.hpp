@@ -4,8 +4,11 @@
 	#ifndef MKL
 		#define MKL
 	#endif
-	#ifndef EIGEN_USE_MKL_ALL
+	#if !defined(MKL_ILP64) && !defined(EIGEN_USE_MKL_ALL)
 		#define EIGEN_USE_MKL_ALL
+	#endif
+	#ifdef MKL_ILP64
+		#define EIGEN_DEFAULT_DENSE_INDEX_TYPE long long
 	#endif
 #else
 	#if __has_include(<Accelerate/Accelerate.h>)

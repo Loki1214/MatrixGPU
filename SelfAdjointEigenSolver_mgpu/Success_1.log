@@ -1,0 +1,44 @@
+Start testing: Apr 30 16:35 UTC
+----------------------------------------------------------
+4/4 Testing: SelfAdjointEigenSolver_mgpu_test
+4/4 Test: SelfAdjointEigenSolver_mgpu_test
+Command: "/usr/local/cuda/bin/compute-sanitizer" "SelfAdjointEigenSolver_mgpu_test"
+Directory: /work/build
+"SelfAdjointEigenSolver_mgpu_test" start time: Apr 30 16:35 UTC
+Output:
+----------------------------------------------------------
+========= COMPUTE-SANITIZER
+Randomness seeded to: 3598314031
+#	 ngpus = 6
+## Preparing a matrix on CPU.
+## Generated random numbers.
+## Prepared a matrix on CPU.	 T_pre = 30.2537 (sec)
+## Enter point 1
+# compute
+## Prepared a matrix on CPU.
+#	  lwork = 2748800040
+#	 lrwork = 5497652509
+#	 liwork = 262143
+#	 info = 0
+## Passed point 1.	 T_diag = -4325.32 (sec)
+## Enter point 2
+# compute
+## Prepared a matrix on CPU.
+#	  lwork = 2748800040
+#	 lrwork = 5497652509
+#	 liwork = 262143
+#	 info = 0
+## Passed point 2.	 T_diag = -4393.09 (sec)
+===============================================================================
+All tests passed (2 assertions in 1 test case)
+
+========= ERROR SUMMARY: 0 errors
+<end of output>
+Test time = 8752.50 sec
+----------------------------------------------------------
+Test Passed.
+"SelfAdjointEigenSolver_mgpu_test" end time: Apr 30 19:01 UTC
+"SelfAdjointEigenSolver_mgpu_test" time elapsed: 02:25:52
+----------------------------------------------------------
+
+End testing: Apr 30 19:01 UTC

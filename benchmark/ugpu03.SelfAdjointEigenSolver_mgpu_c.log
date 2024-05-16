@@ -1,0 +1,80 @@
+# EIGEN_USE_MKL_ALL is NOT set.
+#	 cudaLimitMallocHeapSize = 8388608
+#	 cudaLimitMallocHeapSize = 17681179680
+#	 ngpus = 8
+#	 omp_get_max_threads() = 48
+# /work/benchmark/SelfAdjointEigenSolver_mgpu.cu
+ 102 8.481646e-03 8.256169e-13 8.852244e-13
+ 186 1.181470e-01 2.530725e-12 2.648893e-12
+ 341 6.324556e-02 2.835439e-12 2.897543e-12
+ 630 1.255260e-01 3.306621e-12 3.449418e-12
+1170 3.953906e-01 4.272238e-12 4.395578e-12
+2184 1.035784e+00 6.017175e-12 6.113993e-12
+4096 2.240394e+00 1.044967e-11 1.057831e-11
+7710 6.357556e+00 2.042260e-11 2.066917e-11
+14563 1.928796e+01 4.049968e-11 4.108275e-11
+# EIGEN_USE_MKL_ALL is NOT set.
+#	 cudaLimitMallocHeapSize = 8388608
+#	 cudaLimitMallocHeapSize = 17681179680
+#	 ngpus = 8
+#	 omp_get_max_threads() = 48
+# /work/benchmark/SelfAdjointEigenSolver_mgpu.cu
+# LMax = 22, LMin = 19, Nsample = 10
+# L = 19, dim = 27594
+## Prepared a matrix on CPU.	 T_pre = 0.947067 (sec)
+## Calculated the error. T_err = 65.2392 (sec)
+## Prepared a matrix on CPU.	 T_pre = 1.20451 (sec)
+## Calculated the error. T_err = 66.274 (sec)
+## Prepared a matrix on CPU.	 T_pre = 1.18784 (sec)
+## Calculated the error. T_err = 71.8719 (sec)
+## Prepared a matrix on CPU.	 T_pre = 0.953302 (sec)
+## Calculated the error. T_err = 69.9437 (sec)
+## Prepared a matrix on CPU.	 T_pre = 1.27303 (sec)
+## Calculated the error. T_err = 65.1765 (sec)
+## Prepared a matrix on CPU.	 T_pre = 1.28014 (sec)
+## Calculated the error. T_err = 68.1445 (sec)
+## Prepared a matrix on CPU.	 T_pre = 1.23036 (sec)
+## Calculated the error. T_err = 70.839 (sec)
+## Prepared a matrix on CPU.	 T_pre = 1.24282 (sec)
+## Calculated the error. T_err = 65.0582 (sec)
+## Prepared a matrix on CPU.	 T_pre = 1.26133 (sec)
+## Calculated the error. T_err = 69.3107 (sec)
+## Prepared a matrix on CPU.	 T_pre = 1.21967 (sec)
+## Calculated the error. T_err = 66.1714 (sec)
+27594 6.630307e+01 4.757331e-06 4.779206e-06
+# L = 20, dim = 52428
+# dim * dim = 2748695184
+## Prepared a matrix on CPU.	 norm = 1.048574e+05	 T_pre = 3.42206 (sec)
+## error = 4.05685e-10, Tdiag = 251.446 (sec)
+## Calculated the error. T_err = 408.857 (sec)
+## Prepared a matrix on CPU.	 norm = 1.048560e+05	 T_pre = 3.21926 (sec)
+## error = 4.03211e-10, Tdiag = 515.025 (sec)
+## Calculated the error. T_err = 408.834 (sec)
+## Prepared a matrix on CPU.	 norm = 1.048576e+05	 T_pre = 4.35526 (sec)
+## error = 4.05538e-10, Tdiag = 766.863 (sec)
+## Calculated the error. T_err = 416.383 (sec)
+## Prepared a matrix on CPU.	 norm = 1.048566e+05	 T_pre = 3.19882 (sec)
+## error = 4.05574e-10, Tdiag = 1028.98 (sec)
+## Calculated the error. T_err = 412.661 (sec)
+## Prepared a matrix on CPU.	 norm = 1.048583e+05	 T_pre = 3.51237 (sec)
+## error = 4.02487e-10, Tdiag = 1282.36 (sec)
+## Calculated the error. T_err = 432.537 (sec)
+## Prepared a matrix on CPU.	 norm = 1.048579e+05	 T_pre = 3.16828 (sec)
+## error = 4.01995e-10, Tdiag = 1536.93 (sec)
+## Calculated the error. T_err = 408.928 (sec)
+## Prepared a matrix on CPU.	 norm = 1.048591e+05	 T_pre = 3.22594 (sec)
+## error = 4.05644e-10, Tdiag = 1782.55 (sec)
+## Calculated the error. T_err = 417.881 (sec)
+## Prepared a matrix on CPU.	 norm = 1.048575e+05	 T_pre = 3.31453 (sec)
+## error = 4.01646e-10, Tdiag = 2030.17 (sec)
+## Calculated the error. T_err = 433.08 (sec)
+## Prepared a matrix on CPU.	 norm = 1.048556e+05	 T_pre = 3.49315 (sec)
+## error = 4.05017e-10, Tdiag = 2279.61 (sec)
+## Calculated the error. T_err = 423.093 (sec)
+## Prepared a matrix on CPU.	 norm = 1.048575e+05	 T_pre = 3.43353 (sec)
+## error = 4.03309e-10, Tdiag = 2529.19 (sec)
+## Calculated the error. T_err = 423.855 (sec)
+52428 2.529193e+02 2.01000e-5 2.01416e-05
+# L = 21, dim = 99864
+# dim * dim = 9972818496
+## Prepared a matrix on CPU.	 norm = 1.997251e+05	 T_pre = 13.8359 (sec)

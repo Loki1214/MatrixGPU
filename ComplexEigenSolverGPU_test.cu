@@ -1,9 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
-#include "MatrixGPU.cuh"
-#include "ComplexEigenSolverGPU.cuh"
+#include "MatrixGPU"
+#include "tests/error.hpp"
+#include "tests/generateRandomMatrix.hpp"
 #include <Eigen/Dense>
 #include <iostream>
-#include <random>
 
 #ifdef FLOAT
 using RealScalar = float;
@@ -15,13 +15,9 @@ using Scalar = std::complex<RealScalar>;
 TEST_CASE("MatrixGPU", "test") {
 	GPU::MAGMA::get_controller();
 
-	std::mt19937                         engine(0);
-	std::normal_distribution<RealScalar> dist(0.0, 1.0);
-
 	constexpr int          dim = 100;
-	Eigen::MatrixX<Scalar> mat = Eigen::MatrixX<Scalar>::NullaryExpr(
-	    dim, dim, [&]() { return Scalar(dist(engine), dist(engine)); });
-	mat /= std::sqrt(mat.norm());
+	Eigen::MatrixX<Scalar> mat(dim, dim);
+	GPU::internal::generateRandomMatrix(mat, dim);
 	// Eigen::ComplexEigenSolver<decltype(mat)> solver(mat);
 
 	// GPU::MatrixGPU<decltype(mat)> dmat(mat);
@@ -30,9 +26,8 @@ TEST_CASE("MatrixGPU", "test") {
 	dsolver.compute(mat);
 	// std::cout << dsolver.eigenvalues() << std::endl;
 
-	auto const& eigVecs = dsolver.eigenvectors();
-	auto const  diff
-	    = (mat * eigVecs - eigVecs * dsolver.eigenvalues().asDiagonal()).norm();
+	auto const diff = GPU::internal::diagError(mat, dsolver.eigenvectors(), dsolver.eigenvalues());
+	std::cout << "# diff = " << diff << std::endl;
 
 	constexpr double precision = 1.0E-4;
 	REQUIRE(mat.rows() == dim);
