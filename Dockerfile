@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4-labs
 FROM intel/oneapi-basekit:devel-ubuntu22.04
-FROM nvidia/cuda:12.3.1-devel-ubuntu22.04
+FROM nvidia/cuda:12.4.1-devel-ubuntu22.04
 ENV CUDADIR=/usr/local/cuda
 
 # Install Intel oneAPI
