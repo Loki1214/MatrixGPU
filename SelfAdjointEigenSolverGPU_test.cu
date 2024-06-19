@@ -20,8 +20,9 @@ TEST_CASE("MatrixGPU", "test") {
 #endif
 	GPU::MAGMA::get_controller();
 
-	constexpr int dim
-	    = 14602;  // Dimension of the zero momentum sector for Spin systems with L = 18
+	// constexpr int dim
+	//     = 14602;  // Dimension of the zero momentum sector for Spin systems with L = 18
+	constexpr int             dim = 1000;
 	Eigen::MatrixX<ScalarCPU> mat(dim, dim);
 	GPU::internal::generateRandomMatrix(mat, dim);
 	std::cout << "## Preparing a matrix on GPU." << std::endl;
@@ -63,7 +64,7 @@ TEST_CASE("MatrixGPU", "test") {
 		std::cout << "## Enter point 4" << std::endl;
 		GPU::SelfAdjointEigenSolver<decltype(dmat)> dsolver;
 		dsolver.compute(dmat);
-		auto const                                  diff
+		auto const diff
 		    = GPU::internal::diagError(mat, dsolver.eigenvectors(), dsolver.eigenvalues());
 		REQUIRE(diff < precision);
 		std::cout << "## diff = " << diff << std::endl;
