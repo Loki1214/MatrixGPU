@@ -16,24 +16,13 @@ enable_testing()
 find_package(Eigen3 REQUIRED)
 
 # For BLAS and LAPACK
+set(MKL_INTERFACE_FULL intel_lp64) # For compatibility with Eigen
 find_package(MKL REQUIRED)
 find_package(TBB REQUIRED)
 find_package(OpenMP REQUIRED)
 
 find_package(PkgConfig)
 pkg_check_modules(MAGMA REQUIRED IMPORTED_TARGET magma)
-
-set(modules
-	HighPrecisionComplexEigenSolver
-)
-foreach(name IN LISTS modules)
-	add_executable(${name} ${name}.cpp)
-	target_compile_options(${name} PRIVATE -Wall -Wextra -Wfatal-errors)
-	target_link_libraries(${name}
-		Eigen3::Eigen
-		OpenMP::OpenMP_CXX
-	)
-endforeach(name)
 
 include(CheckLanguage)
 check_language(CUDA)
