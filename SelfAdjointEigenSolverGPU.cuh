@@ -106,7 +106,7 @@ namespace GPU {
 				magma_vec_t  jobz = (option == Eigen::ComputeEigenvectors ? MagmaVec : MagmaNoVec);
 				magma_uplo_t uplo = MagmaLower;
 				magma_int_t const        ldwa = dmat.rows();
-				std::vector<ScalarGPU>   wA(ldwa, dmat.cols());
+				std::vector<ScalarGPU>   wA(ldwa * dmat.cols());
 				std::vector<ScalarGPU>   work(1);
 				std::vector<RealScalar>  rwork(1);
 				std::vector<magma_int_t> iwork(1);
