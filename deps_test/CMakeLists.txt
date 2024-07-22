@@ -131,7 +131,7 @@ endif()
 
 set(target SelfAdjointEigenSolver_magma_test)
 add_executable(${target} SelfAdjointEigenSolver_magma_test.cu)
-target_compile_options(${target} PRIVATE -Wall -Wextra -Wfatal-errors -Xcompiler -DEIGEN_USE_MKL_ALL -fopenmp)
+target_compile_options(${target} PRIVATE -Wall -Wextra -Wfatal-errors -DEIGEN_USE_MKL_ALL -fopenmp)
 target_link_libraries(${target}
 	Catch2::Catch2WithMain
 	Eigen3::Eigen
