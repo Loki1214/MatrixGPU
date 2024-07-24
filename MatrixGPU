@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MatrixGPU.cuh"
+#include "SparseCompressed.cuh"
 #include "SelfAdjointEigenSolverGPU.cuh"
 #include "SelfAdjointEigenSolver_mgpu.cuh"
 #include "ComplexEigenSolverGPU.cuh"
