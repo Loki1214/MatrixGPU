@@ -43,7 +43,7 @@ namespace GPU {
 					cuCHECK(cudaDeviceGetLimit(&pValue, cudaLimitMallocHeapSize));
 					// std::cout << "#\t cudaLimitMallocHeapSize = " << pValue << std::endl;
 
-					cudaGetDeviceProperties(&m_prop[dev], dev);
+					cuCHECK(cudaGetDeviceProperties(&m_prop[dev], dev));
 
 					#pragma omp ordered
 					std::cout << "#\t dev = " << dev
