@@ -48,10 +48,14 @@ namespace GPU {
 				magma_heevd(jobz, uplo, m_eigvecs.rows(), m_eigvecs.data(), m_eigvecs.rows(),
 				            m_eigvals.data(), work.data(), -1, rwork.data(), -1, iwork.data(), -1,
 				            &m_info);
-				DEBUG(std::cerr << "#           m_eigvecs.rows() = " << m_eigvecs.rows() << std::endl);
-				DEBUG(std::cerr << "#           m_eigvecs.cols() = " << m_eigvecs.cols() << std::endl);
-				DEBUG(std::cerr << "# magma_int_t(real(work[0])) = " << magma_int_t(real(work[0])) << std::endl);
-				DEBUG(std::cerr << "#     magma_int_t(rwork[0])) = " << magma_int_t(rwork[0]) << std::endl);
+				DEBUG(std::cerr << "#           m_eigvecs.rows() = " << m_eigvecs.rows()
+				                << std::endl);
+				DEBUG(std::cerr << "#           m_eigvecs.cols() = " << m_eigvecs.cols()
+				                << std::endl);
+				DEBUG(std::cerr << "# magma_int_t(real(work[0])) = " << magma_int_t(real(work[0]))
+				                << std::endl);
+				DEBUG(std::cerr << "#     magma_int_t(rwork[0])) = " << magma_int_t(rwork[0])
+				                << std::endl);
 				DEBUG(std::cerr << "#                   iwork[0] = " << iwork[0] << std::endl);
 				work.resize(magma_int_t(real(work[0])));
 				rwork.resize(magma_int_t(rwork[0]));
@@ -64,6 +68,11 @@ namespace GPU {
 				            magma_int_t(rwork.size()), iwork.data(), magma_int_t(iwork.size()),
 				            &m_info);
 				DEBUG(std::cerr << "# info = " << m_info << "\n" << std::endl);
+				if(m_info != MAGMA_SUCCESS) {
+					std::cerr << "# Error: " << __FILE__ << ":" << __LINE__ << "\t"
+					          << magma_strerror(m_info) << std::endl;
+					std::exit(EXIT_FAILURE);
+				}
 				return *this;
 			}
 	};
@@ -116,10 +125,14 @@ namespace GPU {
 				magma_heevd_gpu(jobz, uplo, m_eigvecs.rows(), m_eigvecs.data(), m_eigvecs.LD(),
 				                m_eigvals.data(), wA.data(), ldwa, work.data(), -1, rwork.data(),
 				                -1, iwork.data(), -1, &m_info);
-				DEBUG(std::cerr << "#           m_eigvecs.rows() = " << m_eigvecs.rows() << std::endl);
-				DEBUG(std::cerr << "#           m_eigvecs.cols() = " << m_eigvecs.cols() << std::endl);
-				DEBUG(std::cerr << "# magma_int_t(real(work[0])) = " << magma_int_t(real(work[0])) << std::endl);
-				DEBUG(std::cerr << "#     magma_int_t(rwork[0])) = " << magma_int_t(rwork[0]) << std::endl);
+				DEBUG(std::cerr << "#           m_eigvecs.rows() = " << m_eigvecs.rows()
+				                << std::endl);
+				DEBUG(std::cerr << "#           m_eigvecs.cols() = " << m_eigvecs.cols()
+				                << std::endl);
+				DEBUG(std::cerr << "# magma_int_t(real(work[0])) = " << magma_int_t(real(work[0]))
+				                << std::endl);
+				DEBUG(std::cerr << "#     magma_int_t(rwork[0])) = " << magma_int_t(rwork[0])
+				                << std::endl);
 				DEBUG(std::cerr << "#                   iwork[0] = " << iwork[0] << std::endl);
 				work.resize(magma_int_t(real(work[0])));
 				rwork.resize(magma_int_t(rwork[0]));
@@ -132,6 +145,11 @@ namespace GPU {
 				                magma_int_t(work.size()), rwork.data(), magma_int_t(rwork.size()),
 				                iwork.data(), magma_int_t(iwork.size()), &m_info);
 				DEBUG(std::cerr << "# info = " << m_info << "\n" << std::endl);
+				if(m_info != MAGMA_SUCCESS) {
+					std::cerr << "# Error: " << __FILE__ << ":" << __LINE__ << "\t"
+					          << magma_strerror(m_info) << std::endl;
+					std::exit(EXIT_FAILURE);
+				}
 				return *this;
 			}
 	};

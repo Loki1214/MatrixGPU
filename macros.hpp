@@ -38,6 +38,7 @@
 					fprintf(stderr, "cuCHECK Error: %s:%d,  ", __FILE__, __LINE__);             \
 					fprintf(stderr, "code:%d, reason: %s\n", error, cudaGetErrorString(error)); \
 					assert(error == cudaSuccess);                                               \
+					std::exit(EXIT_FAILURE);                                                    \
 				}                                                                               \
 			};
 	#else
