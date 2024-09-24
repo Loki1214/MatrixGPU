@@ -22,9 +22,9 @@ namespace std {
 namespace GPU {
 	class MAGMA {
 		private:
-			int                        m_ngpus = 0;
+			int                         m_ngpus = 0;
 			std::vector<cudaDeviceProp> m_prop;
-			std::vector<magma_queue_t> m_queue;
+			std::vector<magma_queue_t>  m_queue;
 
 			MAGMA() {
 				DEBUG(std::cerr << "# Constructor: " << __func__ << std::endl);
@@ -33,35 +33,36 @@ namespace GPU {
 
 				m_prop.resize(m_ngpus);
 #pragma omp parallel for ordered
-				for(int dev = 0;dev < m_ngpus; ++dev) {
+				for(int dev = 0; dev < m_ngpus; ++dev) {
 					cuCHECK(cudaSetDevice(dev));
 					size_t pValue;
 					cuCHECK(cudaDeviceGetLimit(&pValue, cudaLimitMallocHeapSize));
 					// std::cout << "#\t cudaLimitMallocHeapSize = " << pValue << std::endl;
-					pValue *= 32 * 1024;
-					cuCHECK(cudaDeviceSetLimit(cudaLimitMallocHeapSize, pValue));
-					cuCHECK(cudaDeviceGetLimit(&pValue, cudaLimitMallocHeapSize));
-					// std::cout << "#\t cudaLimitMallocHeapSize = " << pValue << std::endl;
+					// pValue *= 32 * 1024;
+					// cuCHECK(cudaDeviceSetLimit(cudaLimitMallocHeapSize, pValue));
+					// cuCHECK(cudaDeviceGetLimit(&pValue, cudaLimitMallocHeapSize));
+					std::cout << "#\t cudaLimitMallocHeapSize = " << pValue << std::endl;
 
 					cuCHECK(cudaGetDeviceProperties(&m_prop[dev], dev));
 
-					#pragma omp ordered
+#pragma omp ordered
 					std::cout << "#\t dev = " << dev
-					<< ",\t multiProcessorCount = " << m_prop[dev].multiProcessorCount
-					<< ",\t maxShMem = " << m_prop[dev].sharedMemPerBlockOptin
-					<< ",\t cudaLimitMallocHeapSize = " << pValue
-					<< std::endl;
+					          << ",\t multiProcessorCount = " << m_prop[dev].multiProcessorCount
+					          << ",\t maxShMem = " << m_prop[dev].sharedMemPerBlockOptin
+					          << ",\t cudaLimitMallocHeapSize = " << pValue << std::endl;
 				}
 				magma_init();
 
 				std::cout << "#\t omp_get_max_threads() = " << omp_get_max_threads() << std::endl;
 				m_queue.resize(omp_get_max_threads());
-#pragma omp parallel
-				magma_queue_create(0, &m_queue[omp_get_thread_num()]);
+				// #pragma omp parallel
+				// 				magma_queue_create(0, &m_queue[omp_get_thread_num()]);
+				magma_queue_create(0, &m_queue[0]);
 			}
 			~MAGMA() {
-#pragma omp parallel
-				magma_queue_destroy(m_queue[omp_get_thread_num()]);
+				magma_queue_destroy(m_queue[0]);
+				// #pragma omp parallel
+				// 				magma_queue_destroy(m_queue[omp_get_thread_num()]);
 				magma_finalize();
 				DEBUG(std::cerr << "# Destructor: " << __func__ << std::endl);
 			}
@@ -77,7 +78,7 @@ namespace GPU {
 				return instance;
 			}
 
-			static int                  ngpus() { return get_controller().m_ngpus; }
+			static int                   ngpus() { return get_controller().m_ngpus; }
 			static cudaDeviceProp const& prop(int dev) { return get_controller().m_prop[dev]; }
 			static magma_queue_t const& queue(int num = 0) { return get_controller().m_queue[num]; }
 	};
