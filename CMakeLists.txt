@@ -66,7 +66,7 @@ foreach(name IN LISTS modules)
 		OpenMP::OpenMP_CXX
 		PkgConfig::MAGMA
 	)
-	add_test(${name}_test compute-sanitizer ${name}_test)
+	add_test(${name}_test compute-sanitizer --leak-check=full ${name}_test)
 
 	# add_executable(${name}_c_test ${name}_test.cu)
 	# target_compile_options(${name}_c_test PRIVATE -Wall -Wextra -Wfatal-errors -DFLOAT)
@@ -78,7 +78,7 @@ foreach(name IN LISTS modules)
 	# 	PkgConfig::MAGMA
 	# 	CUDA::curand
 	# )
-	# add_test(${name}_c_test compute-sanitizer ${name}_c_test)
+	# add_test(${name}_c_test compute-sanitizer --leak-check=full ${name}_c_test)
 endforeach(name)
 
 subdirs(benchmark)

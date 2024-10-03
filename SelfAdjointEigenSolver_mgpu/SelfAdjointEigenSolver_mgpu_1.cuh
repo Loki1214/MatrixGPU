@@ -104,7 +104,7 @@ namespace GPU {
 				//                 << std::endl);
 				// DEBUG(std::cerr << "# magma_int_t(real(work[0])) = " << magma_int_t(real(work[0]))
 				//                 << std::endl);
-				// DEBUG(std::cerr << "#     magma_int_t(rwork[0])) = " << magma_int_t(rwork[0])
+				// DEBUG(std::cerr << "#      magma_int_t(rwork[0]) = " << magma_int_t(rwork[0])
 				//                 << std::endl);
 				// DEBUG(std::cerr << "#                 rwork[0])  = " << rwork[0] << std::endl);
 				// DEBUG(std::cerr << "#                   iwork[0] = " << iwork[0] << std::endl);

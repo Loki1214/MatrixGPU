@@ -301,12 +301,14 @@ static inline magma_int_t magma_heevd_m(magma_int_t ngpu, magma_vec_t jobz, magm
 		return magma_dheevd_m(ngpu, jobz, uplo, n, A, lda, w, work, lwork, rwork, lrwork, iwork,
 		                      liwork, info);
 	}
-	else if constexpr(std::is_same_v<Scalar_, std::complex<float>>) {
+	else if constexpr(std::is_same_v<Scalar_, std::complex<float>>
+	                  || std::is_same_v<Scalar_, cuda::std::complex<float>>) {
 		return magma_cheevd_m(ngpu, jobz, uplo, n, reinterpret_cast<magmaFloatComplex*>(A), lda, w,
 		                      reinterpret_cast<magmaFloatComplex*>(work), lwork, rwork, lrwork,
 		                      iwork, liwork, info);
 	}
-	else if constexpr(std::is_same_v<Scalar_, std::complex<double>>) {
+	else if constexpr(std::is_same_v<Scalar_, std::complex<double>>
+	                  || std::is_same_v<Scalar_, cuda::std::complex<double>>) {
 		return magma_zheevd_m(ngpu, jobz, uplo, n, reinterpret_cast<magmaDoubleComplex*>(A), lda, w,
 		                      reinterpret_cast<magmaDoubleComplex*>(work), lwork, rwork, lrwork,
 		                      iwork, liwork, info);

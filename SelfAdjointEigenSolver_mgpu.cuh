@@ -30,8 +30,21 @@ namespace GPU {
 			SelfAdjointEigenSolver_mgpu(int const ngpus, MatrixCPU const& hmat,
 			                            Eigen::DecompositionOptions option
 			                            = Eigen::ComputeEigenvectors) {
+				std::cout
+				    << "# GPU::SelfAdjointEigenSolver_mgpu from CPU: Copy constructor. (ngpus = "
+				    << ngpus << ")" << std::endl;
 				this->compute(ngpus, hmat, option);
 			}
+			SelfAdjointEigenSolver_mgpu(int const ngpus, MatrixCPU&& hmat,
+			                            Eigen::DecompositionOptions option
+			                            = Eigen::ComputeEigenvectors)
+			    : m_eigvecs(std::move(hmat)) {
+				std::cout
+				    << "# GPU::SelfAdjointEigenSolver_mgpu from CPU: Move constructor. (ngpus = "
+				    << ngpus << ")" << std::endl;
+				this->compute(ngpus, m_eigvecs, option);
+			}
+
 			MatrixCPU const&             eigenvectors() const { return m_eigvecs; }
 			VectorCPU const&             eigenvalues() const { return m_eigvals; }
 			SelfAdjointEigenSolver_mgpu& compute(int const ngpus, MatrixCPU const& hmat,
@@ -42,14 +55,17 @@ namespace GPU {
 				magma_vec_t  jobz = (option == Eigen::ComputeEigenvectors ? MagmaVec : MagmaNoVec);
 				magma_uplo_t uplo = MagmaLower;
 
-				m_eigvecs.resize(hmat.rows(), hmat.cols());
+				if(&m_eigvecs != &hmat) {
+					m_eigvecs.resize(hmat.rows(), hmat.cols());
 #pragma omp parallel for
-				for(Eigen::Index j = 0; j < hmat.size(); ++j) m_eigvecs(j) = hmat(j);
+					for(Eigen::Index j = 0; j < hmat.size(); ++j) m_eigvecs(j) = hmat(j);
+				}
 				m_eigvals.resize(hmat.rows());
 				magma_int_t const dim = hmat.rows();
 
-				DEBUG(std::cout << "## Diagonalizing a matrix on n = " << ngpus << " GPUs." << std::endl);
-				magma_int_t              info  = 0;
+				DEBUG(std::cout << "## Diagonalizing a matrix on n = " << ngpus << " GPUs."
+				                << std::endl);
+				magma_int_t              info = 0;
 				std::vector<ScalarCPU>   work(1);
 				std::vector<RealScalar>  rwork(1);
 				std::vector<magma_int_t> iwork(1);
@@ -59,8 +75,8 @@ namespace GPU {
 				magma_int_t const lrwork = magma_int_t(rwork[0]);
 				magma_int_t const liwork = iwork[0];
 				DEBUG(std::cout << "#\t  lwork = " << lwork << "\n"
-				          << "#\t lrwork = " << lrwork << "\n"
-				          << "#\t liwork = " << liwork << std::endl);
+				                << "#\t lrwork = " << lrwork << "\n"
+				                << "#\t liwork = " << liwork << std::endl);
 				work.resize(lwork);
 				rwork.resize(lrwork);
 				iwork.resize(liwork);
@@ -68,6 +84,12 @@ namespace GPU {
 				              work.data(), lwork, rwork.data(), lrwork, iwork.data(), liwork,
 				              &info);
 				DEBUG(std::cout << "#\t  info = " << info << std::endl);
+
+				if(info != 0) {
+					std::cerr << "# Error: Diagonalization failed with info = " << info
+					          << std::endl;
+					std::exit(EXIT_FAILURE);
+				}
 
 				return *this;
 			}

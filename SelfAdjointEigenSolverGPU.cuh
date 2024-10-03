@@ -29,8 +29,18 @@ namespace GPU {
 			SelfAdjointEigenSolver() = default;
 			SelfAdjointEigenSolver(MatrixCPU const& hmat, Eigen::DecompositionOptions option
 			                                              = Eigen::ComputeEigenvectors) {
+				std::cout << "# GPU::SelfAdjointEigenSolver from CPU: Copy constructor."
+				          << std::endl;
 				this->compute(hmat, option);
 			}
+			SelfAdjointEigenSolver(MatrixCPU&&                 hmat,
+			                       Eigen::DecompositionOptions option = Eigen::ComputeEigenvectors)
+			    : m_eigvecs(std::move(hmat)) {
+				std::cout << "# GPU::SelfAdjointEigenSolver from CPU: Move constructor."
+				          << std::endl;
+				this->compute(m_eigvecs, option);
+			}
+
 			MatrixCPU const&        eigenvectors() const { return m_eigvecs; }
 			VectorCPU const&        eigenvalues() const { return m_eigvals; }
 			SelfAdjointEigenSolver& compute(MatrixCPU const&            hmat,
@@ -43,7 +53,7 @@ namespace GPU {
 				std::vector<RealScalar>  rwork(1);
 				std::vector<magma_int_t> iwork(1);
 
-				m_eigvecs = hmat;
+				if(&m_eigvecs != &hmat) m_eigvecs = hmat;
 				m_eigvals.resize(hmat.rows());
 				magma_heevd(jobz, uplo, m_eigvecs.rows(), m_eigvecs.data(), m_eigvecs.rows(),
 				            m_eigvals.data(), work.data(), -1, rwork.data(), -1, iwork.data(), -1,
@@ -54,7 +64,7 @@ namespace GPU {
 				                << std::endl);
 				DEBUG(std::cerr << "# magma_int_t(real(work[0])) = " << magma_int_t(real(work[0]))
 				                << std::endl);
-				DEBUG(std::cerr << "#     magma_int_t(rwork[0])) = " << magma_int_t(rwork[0])
+				DEBUG(std::cerr << "#      magma_int_t(rwork[0]) = " << magma_int_t(rwork[0])
 				                << std::endl);
 				DEBUG(std::cerr << "#                   iwork[0] = " << iwork[0] << std::endl);
 				work.resize(magma_int_t(real(work[0])));
@@ -131,7 +141,7 @@ namespace GPU {
 				                << std::endl);
 				DEBUG(std::cerr << "# magma_int_t(real(work[0])) = " << magma_int_t(real(work[0]))
 				                << std::endl);
-				DEBUG(std::cerr << "#     magma_int_t(rwork[0])) = " << magma_int_t(rwork[0])
+				DEBUG(std::cerr << "#      magma_int_t(rwork[0]) = " << magma_int_t(rwork[0])
 				                << std::endl);
 				DEBUG(std::cerr << "#                   iwork[0] = " << iwork[0] << std::endl);
 				work.resize(magma_int_t(real(work[0])));
