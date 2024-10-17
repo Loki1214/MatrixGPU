@@ -30,18 +30,18 @@ namespace GPU {
 			SelfAdjointEigenSolver_mgpu(int const ngpus, MatrixCPU const& hmat,
 			                            Eigen::DecompositionOptions option
 			                            = Eigen::ComputeEigenvectors) {
-				std::cout
-				    << "# GPU::SelfAdjointEigenSolver_mgpu from CPU: Copy constructor. (ngpus = "
-				    << ngpus << ")" << std::endl;
+				DEBUG(std::cout
+				      << "# GPU::SelfAdjointEigenSolver_mgpu from CPU: Copy constructor. (ngpus = "
+				      << ngpus << ")" << std::endl);
 				this->compute(ngpus, hmat, option);
 			}
 			SelfAdjointEigenSolver_mgpu(int const ngpus, MatrixCPU&& hmat,
 			                            Eigen::DecompositionOptions option
 			                            = Eigen::ComputeEigenvectors)
 			    : m_eigvecs(std::move(hmat)) {
-				std::cout
-				    << "# GPU::SelfAdjointEigenSolver_mgpu from CPU: Move constructor. (ngpus = "
-				    << ngpus << ")" << std::endl;
+				DEBUG(std::cout
+				      << "# GPU::SelfAdjointEigenSolver_mgpu from CPU: Move constructor. (ngpus = "
+				      << ngpus << ")" << std::endl);
 				this->compute(ngpus, m_eigvecs, option);
 			}
 
