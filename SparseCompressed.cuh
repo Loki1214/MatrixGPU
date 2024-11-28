@@ -1,7 +1,6 @@
 #pragma once
 
-#include "debug.hpp"
-#include "ObjectOnGPU.cuh"
+#include "../HilbertSpace/ObjectOnGPU.cuh"
 #include <Eigen/Sparse>
 #include <thrust/device_vector.h>
 
